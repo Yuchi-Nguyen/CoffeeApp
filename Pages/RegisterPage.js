@@ -14,6 +14,7 @@ import {
 // import CheckBox from '@react-native-community/checkbox';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Feather from 'react-native-vector-icons/Feather';
+import CountryCode from '../Components/CountryCode';
 
 export default function RegisterPage({ navigation }) {
   const [password, setPassword] = useState('');
@@ -84,6 +85,7 @@ export default function RegisterPage({ navigation }) {
 
             {/* Phone Number */}
             <View style={styles.inputContainer}>
+              <CountryCode/>
               <TextInput
                 placeholder="Phone Number"
                 value={phone}
@@ -206,7 +208,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#a9a9a9',
     borderRadius: 10,
-    marginVertical: 10,
+    marginVertical: 8,
     paddingHorizontal: 10,
   },
   icon: {
@@ -229,7 +231,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonText: {
     color: 'white',
@@ -237,7 +239,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   checkboxContainer: {
-    marginVertical: 10,
+    marginVertical: 8,
   },
   checkboxLabel: {
     marginLeft: 35,
@@ -256,7 +258,7 @@ const styles = StyleSheet.create({
   loginWithLogoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 105,
+    paddingHorizontal: 112,
   },
 
   loginWithLogo: {

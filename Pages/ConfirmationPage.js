@@ -9,7 +9,7 @@ export default function ConfirmationPage({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <ConfettiCannon count={200} origin={{ x: 0, y: 0 }} fadeOut />
+            <ConfettiCannon count={200} origin={{ x: 0, y: 0 }} fadeOut explosionSpeed={600} />
             <Image
                 source={require('../assets/checkmark.png')}
                 style={styles.icon}
