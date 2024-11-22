@@ -14,6 +14,7 @@
     "@react-navigation/drawer": "^7.0.7",
     "@react-navigation/native": "^7.0.4",
     "@react-navigation/stack": "^7.0.6",
+    "countries-list": "^3.1.1",
     "expo": "~52.0.7",
     "expo-status-bar": "~2.0.0",
     "react": "18.3.1",
