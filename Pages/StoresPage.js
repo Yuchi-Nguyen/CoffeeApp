@@ -3,12 +3,12 @@ import { StyleSheet, Text, View, SafeAreaView, Image, TextInput, Keyboard, Press
 import Feather from 'react-native-vector-icons/Feather';
 import { AuthContext } from '../context/AuthContext';
 
-const Home = () => {
+const StoresPage = () => {
   return (
     <View>
-      <Text>Home</Text>
+      <Text>StoresPage</Text>
     </View>
   )
 }
 
-export default Home
+export default StoresPage
