@@ -11,7 +11,6 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
-// import CheckBox from '@react-native-community/checkbox';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Feather from 'react-native-vector-icons/Feather';
 import CountryCode from '../Components/CountryCode';
