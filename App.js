@@ -6,9 +6,8 @@ import Header from './Components/UserInfoHeader';
 import Profile from './Pages/ProfilePage';
 export default function App() {
   return (
-    // <AuthProvider>
-    //   <RootNavigator />
-    // </AuthProvider>
-    <Profile/>
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
   );
 }

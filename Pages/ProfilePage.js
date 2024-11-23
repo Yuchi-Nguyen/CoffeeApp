@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, TextInput, ScrollView, TouchableOpacity, Modal, Pressable } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { AuthContext } from '../context/AuthContext';
@@ -10,13 +10,14 @@ const ProfileEdit = () => {
   const [isEditable, setIsEditable] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false); // Modal to choose gender
   const [selectedGender, setSelectedGender] = useState('Male'); // Default gender
+  const [disableDatePicker, setDisableDatePicker] = useState(true);
 
   // State lưu thông tin
   const [profile, setProfile] = useState({
     firstName: 'Uchiha',
     lastName: 'Obito',
     gender: 'Male', // Mặc định là Male
-    birthDate: '2004-01-01',
+    birthDate: '2004-08-08',
     phone: '0123456789',
     email: 'obitouchiha@gmail.com',
   });
@@ -31,6 +32,17 @@ const ProfileEdit = () => {
     setProfile({ ...profile, gender });
     setShowGenderModal(false); // Close modal after selecting gender
   };
+
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || profile.birthDate;
+    // setShowDatePicker(false);
+    const formattedDate = currentDate.toISOString().split('T')[0]; // Định dạng ngày theo kiểu 'yyyy-mm-dd'
+    handleInputChange('birthDate', formattedDate);
+  };
+
+  useEffect(() => {
+    setDisableDatePicker(!isEditable); // Nếu isEditable là true, disableDatePicker sẽ là false
+  }, [isEditable]);
 
   return (
     <>
@@ -91,13 +103,17 @@ const ProfileEdit = () => {
                 </TouchableOpacity>
               </View>
 
+              {/* Date of Birth */}
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Date of Birth</Text>
-                <TextInput
-                  style={[styles.input, isEditable ? styles.editable : null]}
-                  value={profile.birthDate}
-                  onChangeText={(text) => handleInputChange('birthDate', text)}
-                  editable={isEditable}
+                <DateTimePicker
+                  value={new Date(profile.birthDate)}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                  is24Hour={true}
+                  disabled={disableDatePicker} // disable DateTimePicker based on disableDatePicker state
+                  style={{marginLeft: '-20'}}
                 />
               </View>
             </View>
@@ -310,6 +326,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  dateModal: {
+    position: 'absolute',
+    top: 436,
+    left: 20
+  }
 });
 
 export default ProfileEdit;
