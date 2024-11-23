@@ -3,11 +3,17 @@ import { StyleSheet, Text, View, SafeAreaView, Image, TextInput, Keyboard, Press
 import Feather from 'react-native-vector-icons/Feather';
 import { AuthContext } from '../context/AuthContext';
 import CountryCode from '../Components/CountryCode';
+import Header from '../Components/UserInfoHeader'
 
 const Profile = () => {
   return (
     <View>
-      <CountryCode/>
+      <Header
+      userName="Uchiha Obito"
+      memberLevel="MEMBER"
+      drips={120}
+      prepaid={5000}
+    />
     </View>
   )
 }

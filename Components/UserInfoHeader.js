@@ -272,15 +272,16 @@ const styles = StyleSheet.create({
         marginTop: 15,
         paddingHorizontal: 10,
         paddingVertical: 8,
-        backgroundColor: '#007bff',
-        borderRadius: 5,
+        backgroundColor: '#FFF4E1',
+        borderRadius: 15,
         position: 'absolute',
         bottom: 20,
         right: 20,
     },
     topUpText: {
-        color: '#fff',
+        color: '#e77105',
         fontSize: 14,
+        fontWeight: 'bold'
     },
 });
 
