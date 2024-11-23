@@ -5,14 +5,8 @@ import RootNavigator from './Navigation/RootNavigator';
 import Header from './Components/UserInfoHeader';
 export default function App() {
   return (
-    // <AuthProvider>
-    //   <RootNavigator />
-    // </AuthProvider>
-    <Header
-      userName="Uchiha Obito"
-      memberLevel="MEMBER"
-      drips={120}
-      prepaid={5000}
-    />
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
   );
 }
