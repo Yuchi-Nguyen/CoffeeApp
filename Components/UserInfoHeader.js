@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         padding: 20,
         alignItems: 'center',
         backgroundColor: '#f9f9f9',
-        marginTop: 100,
+        marginTop: 50,
         backgroundColor: '#e77105',
     },
     languageButton: {
