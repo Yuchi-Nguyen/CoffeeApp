@@ -9,18 +9,17 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@expo/metro-runtime": "~4.0.0",
     "@react-native-community/datetimepicker": "8.2.0",
-    "@react-navigation/bottom-tabs": "^6.6.1",
-    "@react-navigation/drawer": "^6.7.2",
-    "@react-navigation/native": "^6.1.18",
-    "@react-navigation/stack": "^6.4.1",
+    "@react-navigation/bottom-tabs": "^7.0.7",
+    "@react-navigation/drawer": "^7.0.7",
+    "@react-navigation/native": "^7.0.4",
+    "@react-navigation/stack": "^7.0.6",
     "countries-list": "^3.1.1",
     "expo": "~52.0.7",
     "expo-image-picker": "~16.0.3",
     "expo-status-bar": "~2.0.0",
     "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react-dom": "^18.3.1",
     "react-native": "0.76.2",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-confetti-cannon": "^1.5.2",
@@ -33,7 +32,7 @@
     "react-native-svg": "^15.9.0",
     "react-native-svg-transformer": "^1.5.0",
     "react-native-swiper": "^1.6.0",
-    "react-native-web": "~0.19.13"
+    "react-native-web": "^0.19.13"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2"

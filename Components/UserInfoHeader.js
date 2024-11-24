@@ -16,7 +16,7 @@ const Header = ({ userName, memberLevel, drips, prepaid }) => {
     const [languageModalVisible, setLanguageModalVisible] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState({
         name: 'Tiếng Việt',
-        flag: require('../assets/uk-flag.png'),
+        flag: require('../assets/vn-flag.png'),
     });
     const [avatar, setAvatar] = useState(null);
 
