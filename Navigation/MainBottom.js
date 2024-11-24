@@ -27,7 +27,11 @@ function HomeStack() {
 function OrderStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="OrderScreen" component={OrderPage} />
+      <Stack.Screen 
+        name="OrderScreen" 
+        component={OrderPage}
+        initialParams={{ selectedCategoryId: 1 }}
+      />
       <Stack.Screen name="ProductDetails" component={ProductDetails} />
     </Stack.Navigator>
   );
