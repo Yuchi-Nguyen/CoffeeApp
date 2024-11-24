@@ -22,7 +22,7 @@ const Home = () => {
   }, []);
 
   const handleCategoryPress = (categoryId) => {
-    navigation.navigate('Đặt hàng', { selectedCategoryId: categoryId });
+    navigation.navigate('OrderScreen', { selectedCategoryId: categoryId });
   };
 
   const handleProductPress = (product) => {

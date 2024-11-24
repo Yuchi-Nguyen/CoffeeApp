@@ -20,7 +20,7 @@ const VIEW_MODES = {
   GRID: 'grid'
 };
 
-const OrderPage = () => {
+const OrderPage = ({ navigation }) => {
   const route = useRoute();
   const initialCategoryId = route.params?.selectedCategoryId || 1;
   const [selectedCategory, setSelectedCategory] = useState(initialCategoryId);
@@ -57,6 +57,10 @@ const OrderPage = () => {
       duration: 200,
       useNativeDriver: true,
     }).start(() => setShowOrderTypeModal(false));
+  };
+
+  const handleProductPress = (product) => {
+    navigation.navigate('ProductDetails', { product });
   };
 
   return (
@@ -143,7 +147,10 @@ const OrderPage = () => {
           keyExtractor={(item) => item.id.toString()}
           numColumns={viewMode === VIEW_MODES.GRID ? 2 : 1}
           renderItem={({ item }) => (
-            <TouchableOpacity style={[styles.productCard, viewMode === VIEW_MODES.GRID && styles.gridCard]}>
+            <TouchableOpacity 
+              style={[styles.productCard, viewMode === VIEW_MODES.GRID && styles.gridCard]}
+              onPress={() => handleProductPress(item)}
+            >
               <Image source={{ uri: item.image }} style={styles.productImage} />
               <View style={styles.productContent}>
                 <Text style={styles.productName} numberOfLines={1}>
