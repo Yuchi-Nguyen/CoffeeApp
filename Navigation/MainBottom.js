@@ -1,53 +1,74 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import Home from '../Pages/Home';
 import OrderPage from '../Pages/OrderPage';
 import ActivitiesPage from '../Pages/ActivitiesPage';
 import StoresPage from '../Pages/StoresPage';
 import OthersPage from '../Pages/OthersPage';
+import ProductDetails from '../Pages/ProductDetails';
 import Feather from 'react-native-vector-icons/Feather';
 import { View } from 'react-native';
-import { TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+// Tạo Stack Navigator cho Home
+function HomeStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="HomeScreen" component={Home} />
+      <Stack.Screen name="ProductDetails" component={ProductDetails} />
+    </Stack.Navigator>
+  );
+}
+
+// Tạo Stack Navigator cho Order
+function OrderStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="OrderScreen" component={OrderPage} />
+      <Stack.Screen name="ProductDetails" component={ProductDetails} />
+    </Stack.Navigator>
+  );
+}
 
 export default function MainBottom() {
-  const navigation = useNavigation();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          if (route.name === 'Home') {
-            iconName = 'home'; // Trang chủ
-          } else if (route.name === 'Order') {
-            iconName = 'coffee'; // Đặt hàng
-          } else if (route.name === 'Activities') {
-            iconName = 'clock'; // Hoạt động
-          } else if (route.name === 'Stores') {
-            iconName = 'map-pin'; // Cửa hàng
-          } else if (route.name === 'Others') {
-            iconName = 'menu'; // Các lựa chọn khác
+          if (route.name === 'Trang chủ') {
+            iconName = 'home';
+          } else if (route.name === 'Đặt hàng') {
+            iconName = 'coffee';
+          } else if (route.name === 'Hoạt động') {
+            iconName = 'clock';
+          } else if (route.name === 'Cửa hàng') {
+            iconName = 'map-pin';
+          } else if (route.name === 'Khác') {
+            iconName = 'menu';
           }
           return (
             <View style={{ position: 'relative' }}>
               <Feather name={iconName} size={size} color={color} />
             </View>
-          )
+          );
         },
-        tabBarActiveTintColor: '#4290f5', // Màu cho icon khi được chọn
-        tabBarInactiveTintColor: 'gray', // Màu cho icon khi không được chọn
+        tabBarActiveTintColor: '#4290f5',
+        tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
           backgroundColor: 'white',
           borderTopWidth: 0,
         },
       })}>
-      <Tab.Screen name="Home" component={Home}/>
-      <Tab.Screen name="Order" component={OrderPage} />
-      <Tab.Screen name="Activities" component={ActivitiesPage} />
-      <Tab.Screen name="Stores" component={StoresPage} />
-      <Tab.Screen name="Others" component={OthersPage} />
+      <Tab.Screen name="Trang chủ" component={HomeStack} />
+      <Tab.Screen name="Đặt hàng" component={OrderStack} />
+      <Tab.Screen name="Hoạt động" component={ActivitiesPage} />
+      <Tab.Screen name="Cửa hàng" component={StoresPage} />
+      <Tab.Screen name="Khác" component={OthersPage} />
     </Tab.Navigator>
   );
 }
