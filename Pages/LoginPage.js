@@ -28,7 +28,7 @@ export default function LoginPage({ navigation }) {
                   editable
                   onChangeText={text => setEmailValue(text)}
                   value={emailValue}
-                  placeholder="Email/Phone Number"
+                  placeholder="Email/Số điện thoại"
                   style={styles.textInput}
                   placeholderTextColor="#6a6a6a"
                 />
@@ -40,25 +40,25 @@ export default function LoginPage({ navigation }) {
                   editable
                   onChangeText={text => setPasswordValue(text)}
                   value={passwordValue}
-                  placeholder="Password"
+                  placeholder="Mật Khẩu"
                   style={styles.textInput}
                   placeholderTextColor="#6a6a6a"
                   secureTextEntry
                 />
               </View>
 
-              <Text style={styles.forgotPassword}>Forgot password?</Text>
+              <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
 
               <View style={styles.buttonContainer}>
                 <Pressable
                   onPress={() => login(emailValue, passwordValue)}
                   style={styles.loginButton}>
-                  <Text style={styles.buttonText}>Login</Text>
+                  <Text style={styles.buttonText}>Đăng Nhập</Text>
                 </Pressable>
               </View>
 
               <View style={styles.loginWith}>
-                <Text style={styles.loginWithHeader}>Or login with</Text>
+                <Text style={styles.loginWithHeader}>Hoặc đăng nhập với</Text>
                 <View style={styles.loginWithLogoContainer}>
                   <Image style={styles.loginWithLogo} source={require('../assets/facebook.png')} />
                   <Image style={styles.loginWithLogo} source={require('../assets/google.png')} />
@@ -66,7 +66,7 @@ export default function LoginPage({ navigation }) {
               </View>
 
               <Pressable onPress={() => navigation.navigate('Register')}>
-                <Text style={styles.registerText}>Don't have an account? <Text style={styles.registerTextBold}>Register here</Text></Text>
+                <Text style={styles.registerText}>Chưa có tài khoảng? <Text style={styles.registerTextBold}>Đăng Ký!</Text></Text>
               </Pressable>
             </View>
           </View>
