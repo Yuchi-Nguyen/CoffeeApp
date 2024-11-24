@@ -68,7 +68,7 @@ const CountryCode = () => {
                         <Feather name="search" size={20} color="#000" />
                         <TextInput
                             style={styles.searchInput}
-                            placeholder="Search country..."
+                            placeholder="Tìm kiếm quốc gia..."
                             value={searchText}
                             onChangeText={setSearchText}
                         />
@@ -82,7 +82,7 @@ const CountryCode = () => {
                         style={styles.closeButton}
                         onPress={() => setModalVisible(false)}
                     >
-                        <Text style={styles.closeButtonText}>Close</Text>
+                        <Text style={styles.closeButtonText}>Đóng</Text>
                     </TouchableOpacity>
                 </View>
             </Modal>
