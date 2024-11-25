@@ -14,13 +14,13 @@ export default function ConfirmationPage({ navigation }) {
                 source={require('../assets/checkmark.png')}
                 style={styles.icon}
             />
-            <Text style={styles.title}>Thank You!</Text>
-            <Text style={styles.message}>Your account has been created.</Text>
+            <Text style={styles.title}>Cảm Ơn!</Text>
+            <Text style={styles.message}>Bạn đã tạo tài khoảng thành công.</Text>
             <Pressable
                 style={styles.button}
                 onPress={() => navigation.navigate('Login')}
             >
-                <Text style={styles.buttonText}>Continue</Text>
+                <Text style={styles.buttonText}>Tiếp Tục</Text>
             </Pressable>
         </View>
     );

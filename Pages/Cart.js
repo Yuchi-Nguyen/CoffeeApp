@@ -28,6 +28,8 @@ const CartScreen = () => {
     { id: '1', name: 'Trà Sen Vàng', size: 'S', price: 50, quantity: 1 },
     { id: '2', name: 'Frezze Trà Xanh', size: 'L', price: 50, quantity: 2 },
     { id: '3', name: 'Phin Đen Đá', size: 'M', price: 20, quantity: 1 },
+    { id: '4', name: 'Phindi', size: 'M', price: 25, quantity: 1 },
+    { id: '5', name: 'Hồng Trà', size: 'M', price: 20, quantity: 1 },
   ]);
 
   // State cho mã giảm giá
@@ -171,13 +173,15 @@ const CartScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 30,
     backgroundColor: '#fff',
+    
   },
   orderTypeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
+    marginTop: 16,
   },
   orderTypeButton: {
     flex: 1,

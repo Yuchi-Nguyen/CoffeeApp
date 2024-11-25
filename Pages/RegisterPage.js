@@ -57,13 +57,13 @@ export default function RegisterPage({ navigation }) {
           <View style={styles.container}>
             <View style={styles.logoContainer}>
               <Image source={require('../assets/logo.png')} style={styles.logo} />
-              <Text style={styles.logoText}>Create New Account</Text>
+              <Text style={styles.logoText}>Đăng Ký Tài Khoảng</Text>
             </View>
 
             {/* First Name */}
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="First Name (optional)"
+                placeholder="Họ"
                 value={firstName}
                 onChangeText={setFirstName}
                 style={styles.textInput}
@@ -74,7 +74,7 @@ export default function RegisterPage({ navigation }) {
             {/* Last Name */}
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Last Name (optional)"
+                placeholder="Tên"
                 value={lastName}
                 onChangeText={setLastName}
                 style={styles.textInput}
@@ -84,9 +84,9 @@ export default function RegisterPage({ navigation }) {
 
             {/* Phone Number */}
             <View style={styles.inputContainer}>
-              <CountryCode/>
+              <CountryCode />
               <TextInput
-                placeholder="Phone Number"
+                placeholder="Số Điện Thoại"
                 value={phone}
                 onChangeText={validatePhone}
                 keyboardType="phone-pad"
@@ -100,7 +100,7 @@ export default function RegisterPage({ navigation }) {
 
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Password"
+                placeholder="Mật Khẩu"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -111,7 +111,7 @@ export default function RegisterPage({ navigation }) {
 
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Confirm Password"
+                placeholder="Nhập Lại Mật Khẩu"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
@@ -119,7 +119,7 @@ export default function RegisterPage({ navigation }) {
                 placeholderTextColor="#6a6a6a"
               />
               {isPasswordMatch && (
-                <Feather name="check-circle" size={25} color="green"/>
+                <Feather name="check-circle" size={25} color="green" />
               )}
             </View>
 
@@ -134,7 +134,7 @@ export default function RegisterPage({ navigation }) {
                 onPress={(isChecked) => setAgreePolicies(isChecked)}
               />
               <Text style={styles.checkboxLabel}>
-                I agree to the Terms & Policies.
+                Tôi đồng ý với Các Điều Khoản & Chính Sách.
               </Text>
             </View>
 
@@ -149,7 +149,7 @@ export default function RegisterPage({ navigation }) {
                 onPress={(isChecked) => setAgreeLoyalty(isChecked)}
               />
               <Text style={styles.checkboxLabel}>
-                I agree to the Membership Program.
+                Tôi đồng ý với Chương Trình Thành Viên.
               </Text>
             </View>
 
@@ -160,12 +160,12 @@ export default function RegisterPage({ navigation }) {
                   handleRegister()
                 }}
               >
-                <Text style={styles.buttonText}>Register</Text>
+                <Text style={styles.buttonText}>Đăng Ký</Text>
               </Pressable>
             </View>
 
             <View style={styles.loginWith}>
-              <Text style={styles.loginWithHeader}>Or login with</Text>
+              <Text style={styles.loginWithHeader}>Hoặc đăng ký với</Text>
               <View style={styles.loginWithLogoContainer}>
                 <Image style={styles.loginWithLogo} source={require('../assets/facebook.png')} />
                 <Image style={styles.loginWithLogo} source={require('../assets/google.png')} />
@@ -173,7 +173,7 @@ export default function RegisterPage({ navigation }) {
             </View>
 
             <Pressable onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginText}>Already have an account? <Text style={styles.loginTextBold}>Log In!</Text></Text>
+              <Text style={styles.loginText}>Đã có tài khoảng? <Text style={styles.loginTextBold}>Đăng Nhập!</Text></Text>
             </Pressable>
           </View>
         </SafeAreaView>

@@ -9,14 +9,14 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 const ProfileEdit = () => {
   const [isEditable, setIsEditable] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false); // Modal to choose gender
-  const [selectedGender, setSelectedGender] = useState('Male'); // Default gender
+  const [selectedGender, setSelectedGender] = useState('Nam'); // Default gender
   const [disableDatePicker, setDisableDatePicker] = useState(true);
 
   // State lưu thông tin
   const [profile, setProfile] = useState({
     firstName: 'Uchiha',
     lastName: 'Obito',
-    gender: 'Male', // Mặc định là Male
+    gender: 'Nam', // Mặc định là Nam
     birthDate: '2004-08-08',
     phone: '0123456789',
     email: 'obitouchiha@gmail.com',
@@ -55,7 +55,7 @@ const ProfileEdit = () => {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerText}>Edit Profile</Text>
+          <Text style={styles.headerText}>Chỉnh Sửa</Text>
           <TouchableOpacity
             style={styles.editButton}
             onPress={() => setIsEditable(!isEditable)}
@@ -69,10 +69,10 @@ const ProfileEdit = () => {
           <ScrollView contentContainerStyle={styles.content}>
             {/* Thông tin chung */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>General Information</Text>
+              <Text style={styles.sectionLabel}>Thông Tin Chung</Text>
               <View style={styles.row}>
                 <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>First Name</Text>
+                  <Text style={styles.inputLabel}>Họ</Text>
                   <TextInput
                     style={[styles.input, isEditable ? styles.editable : null]}
                     value={profile.firstName}
@@ -81,7 +81,7 @@ const ProfileEdit = () => {
                   />
                 </View>
                 <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Last Name</Text>
+                  <Text style={styles.inputLabel}>Tên</Text>
                   <TextInput
                     style={[styles.input, isEditable ? styles.editable : null]}
                     value={profile.lastName}
@@ -93,7 +93,7 @@ const ProfileEdit = () => {
 
               {/* Giới tính */}
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Gender</Text>
+                <Text style={styles.inputLabel}>Giới tính</Text>
                 <TouchableOpacity
                   style={[styles.input, isEditable ? styles.editable : null]}
                   onPress={() => isEditable && setShowGenderModal(true)} // Show modal if editable
@@ -105,7 +105,7 @@ const ProfileEdit = () => {
 
               {/* Date of Birth */}
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Date of Birth</Text>
+                <Text style={styles.inputLabel}>Ngày Sinh</Text>
                 <DateTimePicker
                   value={new Date(profile.birthDate)}
                   mode="date"
@@ -120,7 +120,7 @@ const ProfileEdit = () => {
 
             {/* Số điện thoại */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Phone Number</Text>
+              <Text style={styles.sectionLabel}>Số Điện Thoại</Text>
               <View style={styles.row}>
                 <CountryCode />
                 <View style={[styles.inputContainer, styles.phoneContainer]}>
@@ -156,33 +156,33 @@ const ProfileEdit = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Gender</Text>
+            <Text style={styles.modalTitle}>Chọn Giới Tính</Text>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleGenderSelect('Male')}
+              onPress={() => handleGenderSelect('Nam')}
             >
               <Feather name="user" size={20} color="#007bff" />
-              <Text style={styles.modalText}>Male</Text>
+              <Text style={styles.modalText}>Nam</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleGenderSelect('Female')}
+              onPress={() => handleGenderSelect('Nữ')}
             >
               <Feather name="user" size={20} color="#ff69b4" />
-              <Text style={styles.modalText}>Female</Text>
+              <Text style={styles.modalText}>Nữ</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleGenderSelect('Prefer not to say')}
+              onPress={() => handleGenderSelect('Không Nói')}
             >
               <Feather name="help-circle" size={20} color="#ccc" />
-              <Text style={styles.modalText}>Prefer not to say</Text>
+              <Text style={styles.modalText}>Không Nói</Text>
             </TouchableOpacity>
             <Pressable
               style={styles.modalCloseButton}
               onPress={() => setShowGenderModal(false)}
             >
-              <Text style={styles.modalCloseText}>Close</Text>
+              <Text style={styles.modalCloseText}>Đóng</Text>
             </Pressable>
           </View>
         </View>
