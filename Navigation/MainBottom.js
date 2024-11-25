@@ -54,9 +54,10 @@ export default function MainBottom() {
             iconName = 'map-pin';
           } else if (route.name === 'Khác') {
             iconName = 'menu';
-          } else if (route.name === 'Cart') {
-            iconName = 'shopping-cart';
-          }
+          } 
+          // else if (route.name === 'Cart') {
+          //   iconName = 'shopping-cart';
+          // }
           return (
             <View style={{ position: 'relative' }}>
               <Feather name={iconName} size={size} color={color} />
@@ -75,7 +76,7 @@ export default function MainBottom() {
       <Tab.Screen name="Hoạt động" component={ActivitiesPage} />
       <Tab.Screen name="Cửa hàng" component={StoresPage} />
       <Tab.Screen name="Khác" component={OthersPage} />
-      <Tab.Screen name='Cart' component={CartScreen}/>
+      {/* <Tab.Screen name='Cart' component={CartScreen}/> */}
     </Tab.Navigator>
   );
 }

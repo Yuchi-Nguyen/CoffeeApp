@@ -9,7 +9,24 @@ import {
   Alert,
 } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
+import Feather from 'react-native-vector-icons/Feather';
+
+
 const CartScreen = () => {
+  const navigation = useNavigation();
+  const Header = () => (
+    <View style={styles.headerContainer}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Feather name="arrow-left" size={24} color="#000" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle}>Giỏ hàng</Text>
+    </View>
+  );
+
   // State cho hình thức (Dine-in hoặc Pick-up)
   const [orderType, setOrderType] = useState(null);
 
@@ -22,7 +39,7 @@ const CartScreen = () => {
       setTime(customTime); // Cập nhật state `time` với giá trị `customTime` từ TextInput
     }
   };
-    
+
   // State cho danh sách sản phẩm
   const [cartItems, setCartItems] = useState([
     { id: '1', name: 'Trà Sen Vàng', size: 'S', price: 50, quantity: 1 },
@@ -63,7 +80,7 @@ const CartScreen = () => {
       Alert.alert('Discount Applied', 'You saved $10!');
     } else {
       Alert.alert('Invalid Code', 'Please enter a valid discount code.');
-    }    
+    }
   };
   const handlePlaceOrder = () => {
     alert("Đơn hàng của bạn đã được đặt thành công!");
@@ -71,6 +88,7 @@ const CartScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Header />
       {/* Chọn hình thức */}
       <View style={styles.orderTypeContainer}>
         <TouchableOpacity
@@ -161,9 +179,9 @@ const CartScreen = () => {
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total: ${calculateTotal().toFixed(2)}</Text>
         {/* Nút Place Order */}
-      <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
-        <Text style={styles.placeOrderText}>Place Order</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
+          <Text style={styles.placeOrderText}>Place Order</Text>
+        </TouchableOpacity>
       </View>
 
     </View>
@@ -171,11 +189,28 @@ const CartScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    marginBottom: 10,
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 15,
+  },
+
   container: {
     flex: 1,
     padding: 30,
     backgroundColor: '#fff',
-    
+
   },
   orderTypeContainer: {
     flexDirection: 'row',
@@ -298,7 +333,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 100,
     alignItems: 'center',
-    marginBottom:12,
+    marginBottom: 12,
   },
   updateText: { color: '#fff', fontWeight: 'bold' },
   itemContainer: {
