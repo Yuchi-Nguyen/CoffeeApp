@@ -9,6 +9,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import { View } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Cart from '../Pages/Cart';
+import CartScreen from '../Pages/Cart';
 
 const Tab = createBottomTabNavigator();
 
@@ -29,6 +31,8 @@ export default function MainBottom() {
             iconName = 'map-pin'; // Cửa hàng
           } else if (route.name === 'Others') {
             iconName = 'menu'; // Các lựa chọn khác
+          } else if (route.name === 'Cart') {
+            iconName = 'cart';
           }
           return (
             <View style={{ position: 'relative' }}>
@@ -48,6 +52,7 @@ export default function MainBottom() {
       <Tab.Screen name="Activities" component={ActivitiesPage} />
       <Tab.Screen name="Stores" component={StoresPage} />
       <Tab.Screen name="Others" component={OthersPage} />
+      <Tab.Screen name="Cart" component={CartScreen}/>
     </Tab.Navigator>
   );
 }
