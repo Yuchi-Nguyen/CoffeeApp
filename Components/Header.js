@@ -1,8 +1,16 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import { useNavigation } from '@react-navigation/native';
 
-const Header = ({ onUserPress, onCartPress, onSearchPress }) => {
+const Header = ({ onUserPress, onSearchPress }) => {
+
+  const navigation = useNavigation();
+
+  const handleCartPress = () => {
+    navigation.navigate('Cart');
+  };
+
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={onUserPress}>
@@ -10,7 +18,7 @@ const Header = ({ onUserPress, onCartPress, onSearchPress }) => {
       </TouchableOpacity>
 
       <View style={styles.headerIcons}>
-        <TouchableOpacity onPress={onCartPress}>
+        <TouchableOpacity onPress={handleCartPress}>
           <Image 
             source={require('../assets/coffee.png')} 
             style={styles.coffeeIcon}
