@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../Components/Header';
 import { Data } from '../Data';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 const VIEW_MODES = {
   LIST: 'list',
@@ -61,6 +61,12 @@ const OrderPage = ({ navigation }) => {
 
   const handleProductPress = (product) => {
     navigation.navigate('ProductDetails', { product });
+  };
+
+  const navigationCart = useNavigation();
+
+  const handleCartPress = () => {
+    navigationCart.navigate('Cart');
   };
 
   return (
@@ -189,7 +195,7 @@ const OrderPage = ({ navigation }) => {
           />
         </TouchableOpacity>
         <Text style={styles.storeText}>CoopXtra Linh Trung HCM</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleCartPress}>
           <Image
             source={{
               uri: 'https://img.icons8.com/ios-filled/50/000000/shopping-cart.png',

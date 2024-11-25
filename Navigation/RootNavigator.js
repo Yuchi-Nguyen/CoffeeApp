@@ -5,6 +5,9 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { AuthContext } from '../context/AuthContext';
 import AuthStack from './AuthStack';
 import MainBottom from './MainBottom';
+import CartScreen from '../Pages/Cart';
+
+
 const Stack = createStackNavigator();
 export default function RootNavigator() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -15,6 +18,7 @@ export default function RootNavigator() {
         {isAuthenticated ? (
           <>
             <Stack.Screen name="Main" component={MainBottom} />
+            <Stack.Screen name="Cart" component={CartScreen} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthStack} />
