@@ -11,9 +11,13 @@ const Header = ({ onUserPress, onSearchPress }) => {
     navigation.navigate('Cart');
   };
 
+  const handleProfilePress = () => {
+    navigation.navigate('Profile');
+  };
+
   return (
     <View style={styles.header}>
-      <TouchableOpacity onPress={onUserPress}>
+      <TouchableOpacity onPress={handleProfilePress}>
         <Feather name="user" size={24} color="#000" />
       </TouchableOpacity>
 
