@@ -307,3 +307,33 @@ export const Data = {
     ],
   };
   
+  export const stores = [
+    {
+      id: 1,
+      name: "Phúc Long Coffee & Tea",
+      address: "218a Đ. Tô Hiến Thành, Cư xá Bắc Hải, Q.10, HCM",
+      phone: "028 3862 9999",
+      openHours: "07:00 - 22:30",
+      location: { latitude: 10.776636533485437, longitude: 106.66358960954852 },
+      image: "https://lh3.googleusercontent.com/p/AF1QipNemj2kQnnh1YoPi2mJAhgUb4Iy-zFt3qzYrc4I=s1360-w1360-h1020"
+    },
+    {
+      id: 2,
+      name: "Phúc Long Tea & Coffee - 31 Ngô Đức Kế",
+      address: "31 Ngô Đức Kế, Bến Nghé, Quận 1, Hồ Chí Minh",
+      phone: "028 7100 1968",
+      openHours: "07:00 - 22:00",
+      location: { latitude: 10.773396, longitude: 106.705533 },
+      image: "https://lh5.googleusercontent.com/p/AF1QipPVVlz3L8OSMoaUPuGPSJN3CfI6JJSPZD5fna3G=w292-h196-n-k-no"
+    },
+    {
+      id: 3,
+      name: "Phúc Long Tea & Coffee - 734 Kha Vạn Cân",
+      address: "734 Đ. Kha Vạng Cân, Linh Đông, Thủ Đức, Hồ Chí Minh",
+      phone: "028 7100 1968",
+      openHours: "07:00 - 22:30",
+      location: { latitude: 10.846534125954644, longitude: 106.75121433736966 },
+      image: "https://lh5.googleusercontent.com/p/AF1QipOa3CMfh9p3B-6gtk8ZC9PYcwcT5l_zKcVvO4xU=w426-h240-k-no"
+    },
+  ];
+  

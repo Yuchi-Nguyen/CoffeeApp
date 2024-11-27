@@ -28,7 +28,7 @@ const OrderPage = ({ navigation }) => {
   const [searchText, setSearchText] = useState(''); // Nội dung tìm kiếm
   const [orderType, setOrderType] = useState('Dine-in');
   const [showOrderTypeModal, setShowOrderTypeModal] = useState(false);
-  const slideAnim = useRef(new Animated.Value(300)).current; // Start from 300px below
+  const slideAnim = useRef(new Animated.Value(300)).current; 
 
   useEffect(() => {
     if (route.params?.selectedCategoryId) {
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   categoryTextContainer: {
     alignItems: 'center',
     position: 'relative',
-    paddingBottom: 4, // Space for underline
+    paddingBottom: 4, 
   },
   categoryText: {
     fontSize: 14,
