@@ -6,6 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 import AuthStack from './AuthStack';
 import MainBottom from './MainBottom';
 import CartScreen from '../Pages/Cart';
+import ProfileEdit from '../Pages/ProfilePage';
 
 
 const Stack = createStackNavigator();
@@ -19,6 +20,7 @@ export default function RootNavigator() {
           <>
             <Stack.Screen name="Main" component={MainBottom} />
             <Stack.Screen name="Cart" component={CartScreen} />
+            <Stack.Screen name="Profile" component={ProfileEdit} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthStack} />
