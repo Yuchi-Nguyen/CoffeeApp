@@ -5,12 +5,14 @@ import { AuthContext } from '../context/AuthContext';
 import CountryCode from '../Components/CountryCode';
 import Header from '../Components/UserInfoHeader';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
 
 const ProfileEdit = () => {
   const [isEditable, setIsEditable] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false); // Modal to choose gender
   const [selectedGender, setSelectedGender] = useState('Nam'); // Default gender
   const [disableDatePicker, setDisableDatePicker] = useState(true);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // State lưu thông tin
   const [profile, setProfile] = useState({
@@ -44,6 +46,9 @@ const ProfileEdit = () => {
     setDisableDatePicker(!isEditable); // Nếu isEditable là true, disableDatePicker sẽ là false
   }, [isEditable]);
 
+  // Thêm navigation
+  const navigation = useNavigation();
+
   return (
     <>
       <Header
@@ -53,9 +58,17 @@ const ProfileEdit = () => {
         prepaid={5000}
       />
       <View style={styles.container}>
-        {/* Header */}
+        {/* Header với nút back */}
         <View style={styles.header}>
-          <Text style={styles.headerText}>Chỉnh Sửa</Text>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Feather name="arrow-left" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.headerText}>Chỉnh Sửa</Text>
+          </View>
           <TouchableOpacity
             style={styles.editButton}
             onPress={() => setIsEditable(!isEditable)}
@@ -106,15 +119,28 @@ const ProfileEdit = () => {
               {/* Date of Birth */}
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Ngày Sinh</Text>
-                <DateTimePicker
-                  value={new Date(profile.birthDate)}
-                  mode="date"
-                  display="default"
-                  onChange={handleDateChange}
-                  is24Hour={true}
-                  disabled={disableDatePicker} // disable DateTimePicker based on disableDatePicker state
-                  style={{marginLeft: '-20'}}
-                />
+                <TouchableOpacity
+                  style={[styles.input, isEditable ? styles.editable : null]}
+                  onPress={() => isEditable && setShowDatePicker(true)}
+                >
+                  <Text style={styles.inputValue}>{profile.birthDate}</Text>
+                </TouchableOpacity>
+                
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={new Date(profile.birthDate)}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      setShowDatePicker(false);
+                      if (selectedDate) {
+                        const formattedDate = selectedDate.toISOString().split('T')[0];
+                        handleInputChange('birthDate', formattedDate);
+                      }
+                    }}
+                    is24Hour={true}
+                  />
+                )}
               </View>
             </View>
 
@@ -206,6 +232,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     position: 'absolute'
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginRight: 10,
+    padding: 5,
   },
   headerText: {
     color: '#fff',
