@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context'; // Import SafeAreaView
+import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Swiper from 'react-native-swiper';
 import Header from '../Components/Header';
 import { Data } from '../Data';
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   promoItem: {
     marginRight: 16,
-    width: 150, // Đảm bảo kích thước cố định
+    width: 150, 
     flex: 1,
     justifyContent: 'space-between',
   },
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   promoText: {
     marginTop: 8,
     fontSize: 14,
-    textAlign: 'center', // Giữ chữ căn giữa
+    textAlign: 'center', 
     color: '#000',
   },
   productItem: {
