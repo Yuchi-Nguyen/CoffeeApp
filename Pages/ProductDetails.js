@@ -13,14 +13,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ProductDetails = ({ route, navigation }) => {
-  const { product } = route.params; // Nhận tham số sản phẩm từ route
+  const { product } = route.params; 
   const [quantity, setQuantity] = useState(1);
   const [specialInstructions, setSpecialInstructions] = useState('');
 
-  // Tính tổng tiền với định dạng đầy đủ
+  // Tính tổng tiền
   const calculateTotal = () => {
     const total = parseFloat(product.price) * quantity;
-    // Thêm .000 và định dạng theo tiền tệ Việt Nam
+    // Định dạng theo tiền tệ Việt Nam
     return total.toLocaleString('vi-VN', {
       minimumFractionDigits: 3,
       maximumFractionDigits: 3
@@ -36,7 +36,7 @@ const ProductDetails = ({ route, navigation }) => {
   };
 
   const handleAddToCart = () => {
-    // Logic thêm vào giỏ hàng
+    // Thêm vào giỏ hàng
     console.log('Added to cart:', {
       product,
       quantity,
