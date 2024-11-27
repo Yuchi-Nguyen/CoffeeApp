@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 
@@ -91,6 +91,59 @@ const ActivitiesPage = () => {
     );
   };
 
+  // Thêm state để lưu thời gian còn lại cho mỗi đơn hàng
+  const [timeLeft, setTimeLeft] = useState({});
+
+  // Thêm useEffect để xử lý đếm ngược
+  useEffect(() => {
+    // Khởi tạo thời gian cho các đơn unpaid
+    const initialTimeLeft = {};
+    orders.forEach(order => {
+      if (order.status === 'unpaid') {
+        initialTimeLeft[order.id] = 300; // 5 phút = 300 giây
+      }
+    });
+    setTimeLeft(initialTimeLeft);
+
+    // Tạo interval để đếm ngược
+    const timer = setInterval(() => {
+      setTimeLeft(prevTime => {
+        const newTime = { ...prevTime };
+        let needsUpdate = false;
+
+        // Cập nhật thời gian và kiểm tra hết giờ
+        Object.keys(newTime).forEach(orderId => {
+          if (newTime[orderId] > 0) {
+            newTime[orderId] -= 1;
+            if (newTime[orderId] === 0) {
+              // Tự động hủy đơn khi hết thời gian
+              setOrders(prevOrders =>
+                prevOrders.map(order =>
+                  order.id === orderId
+                    ? { ...order, status: 'failed' }
+                    : order
+                )
+              );
+            }
+            needsUpdate = true;
+          }
+        });
+
+        return needsUpdate ? newTime : prevTime;
+      });
+    }, 1000);
+
+    // Cleanup timer
+    return () => clearInterval(timer);
+  }, []);
+
+  // Hàm format thời gian
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   const renderOrderCard = (order) => (
     <View style={styles.orderCard} key={order.id}>
       {/* Header của đơn hàng */}
@@ -104,16 +157,23 @@ const ActivitiesPage = () => {
             /> {order.serviceType}
           </Text>
         </View>
-        <View style={[
-          styles.statusBadge, 
-          { backgroundColor: getStatusColor(order.status) + '20' }
-        ]}>
-          <Text style={[
-            styles.statusText, 
-            { color: getStatusColor(order.status) }
+        <View>
+          {order.status === 'unpaid' && timeLeft[order.id] > 0 && (
+            <Text style={styles.timerText}>
+              <Feather name="clock" size={14} /> {formatTime(timeLeft[order.id])}
+            </Text>
+          )}
+          <View style={[
+            styles.statusBadge, 
+            { backgroundColor: getStatusColor(order.status) + '20' }
           ]}>
-            {order.status.toUpperCase()}
-          </Text>
+            <Text style={[
+              styles.statusText, 
+              { color: getStatusColor(order.status) }
+            ]}>
+              {order.status.toUpperCase()}
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -296,6 +356,13 @@ const styles = StyleSheet.create({
   paidText: {
     color: '#28a745',
     fontWeight: 'bold',
+  },
+  timerText: {
+    fontSize: 14,
+    color: '#dc3545',
+    fontWeight: 'bold',
+    marginBottom: 4,
+    textAlign: 'right',
   },
 });
 
