@@ -22,8 +22,7 @@ const VIEW_MODES = {
 
 const OrderPage = ({ navigation }) => {
   const route = useRoute();
-  const initialCategoryId = route.params?.selectedCategoryId || 1;
-  const [selectedCategory, setSelectedCategory] = useState(initialCategoryId);
+  const [selectedCategory, setSelectedCategory] = useState(1);
   const [viewMode, setViewMode] = useState(VIEW_MODES.LIST); // 'list' hoặc 'grid'
   const [searchText, setSearchText] = useState(''); // Nội dung tìm kiếm
   const [orderType, setOrderType] = useState('Dine-in');
