@@ -138,7 +138,7 @@ const Home = () => {
               >
                 <Image source={{ uri: item.image }} style={styles.productImage} />
                 <Text style={styles.productName}>{item.name}</Text>
-                <Text style={styles.productPrice}>{item.price} đ</Text>
+                <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
               </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id.toString()}
