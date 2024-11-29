@@ -31,7 +31,10 @@ function OrderStack() {
         name="OrderScreen" 
         component={OrderPage}
       />
-      <Stack.Screen name="ProductDetails" component={ProductDetails} />
+      <Stack.Screen 
+        name="ProductDetails" 
+        component={ProductDetails} 
+      />
     </Stack.Navigator>
   );
 }
