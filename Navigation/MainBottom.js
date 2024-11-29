@@ -30,7 +30,6 @@ function OrderStack() {
       <Stack.Screen 
         name="OrderScreen" 
         component={OrderPage}
-        initialParams={{ selectedCategoryId: 1 }}
       />
       <Stack.Screen name="ProductDetails" component={ProductDetails} />
     </Stack.Navigator>
