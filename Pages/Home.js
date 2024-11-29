@@ -32,7 +32,12 @@ const Home = () => {
           id: doc.id,
           ...doc.data()
         }));
-        setCategories(categoriesData);
+        const sortedCategories = categoriesData.sort((a, b) => {
+          const idA = parseInt(a.id);
+          const idB = parseInt(b.id);
+          return idA - idB;
+        });
+        setCategories(sortedCategories);
 
         // Fetch promotions
         const promotionsSnapshot = await getDocs(collection(db, 'promotions'));
@@ -61,7 +66,10 @@ const Home = () => {
   }, []);
 
   const handleCategoryPress = (categoryId) => {
-    navigation.navigate('OrderScreen', { selectedCategoryId: categoryId });
+    navigation.navigate('Đặt hàng', {
+      screen: 'OrderScreen',
+      params: { selectedCategoryId: categoryId }
+    });
   };
 
   const handleProductPress = (product) => {
