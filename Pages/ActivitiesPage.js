@@ -1,33 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { firebaseService } from '../services/firebaseService';
 
 const ActivitiesPage = () => {
-  // Thay đổi từ useState([...]) sang useState để có thể cập nhật
-  const [orders, setOrders] = useState([
-    {
-      id: 'ORD001',
-      serviceType: 'Dine-in',
-      items: [
-        { name: 'Cà phê sữa', quantity: 2 },
-        { name: 'Bánh mì', quantity: 1 }
-      ],
-      location: 'Tầng 1, Tòa nhà A',
-      total: 120000,
-      status: 'unpaid',
-    },
-    {
-      id: 'ORD002',
-      serviceType: 'Pick-up',
-      items: [
-        { name: 'Trà sữa', quantity: 3 },
-        { name: 'Bánh flan', quantity: 2 }
-      ],
-      location: 'Tầng 2, Tòa nhà B',
-      total: 180000,
-      status: 'paid',
-    },
-  ]);
+  const { user } = useContext(AuthContext);
+  const [orders, setOrders] = useState([]);
+  const [timeLeft, setTimeLeft] = useState({});
 
   // Thêm lại hàm getStatusColor
   const getStatusColor = (status) => {
@@ -43,8 +24,38 @@ const ActivitiesPage = () => {
     }
   };
 
-  // Thêm hàm xử lý thanh toán
-  const handlePayment = (orderId) => {
+  // Load orders
+  useEffect(() => {
+    loadOrders();
+  }, [user]);
+
+  const loadOrders = async () => {
+    try {
+      if (user) {
+        const userOrders = await firebaseService.getOrders(user.uid);
+        setOrders(userOrders);
+        
+        // Initialize timers for unpaid orders
+        const initialTimeLeft = {};
+        userOrders.forEach(order => {
+          if (order.status === 'unpaid') {
+            const createdAt = new Date(order.createdAt);
+            const now = new Date();
+            const elapsed = Math.floor((now - createdAt) / 1000);
+            const remaining = Math.max(0, order.timeLimit - elapsed);
+            initialTimeLeft[order.id] = remaining;
+          }
+        });
+        setTimeLeft(initialTimeLeft);
+      }
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      Alert.alert('Lỗi', 'Không thể tải danh sách đơn hàng');
+    }
+  };
+
+  // Handle payment
+  const handlePayment = async (orderId) => {
     Alert.alert(
       "Xác nhận thanh toán",
       "Bạn có chắc chắn muốn thanh toán đơn hàng này?",
@@ -55,20 +66,22 @@ const ActivitiesPage = () => {
         },
         {
           text: "Đồng ý",
-          onPress: () => {
-            setOrders(orders.map(order => 
-              order.id === orderId 
-                ? {...order, status: 'paid'}
-                : order
-            ));
+          onPress: async () => {
+            try {
+              await firebaseService.updateOrderStatus(orderId, 'paid');
+              await loadOrders();
+            } catch (error) {
+              console.error('Error updating order:', error);
+              Alert.alert('Lỗi', 'Không thể cập nhật trạng thái đơn hàng');
+            }
           }
         }
       ]
     );
   };
 
-  // Thêm hàm xử lý hủy đơn
-  const handleCancel = (orderId) => {
+  // Handle cancel
+  const handleCancel = async (orderId) => {
     Alert.alert(
       "Xác nhận hủy đơn",
       "Bạn có chắc chắn muốn hủy đơn hàng này?",
@@ -79,51 +92,35 @@ const ActivitiesPage = () => {
         },
         {
           text: "Có",
-          onPress: () => {
-            setOrders(orders.map(order => 
-              order.id === orderId 
-                ? {...order, status: 'failed'}
-                : order
-            ));
+          onPress: async () => {
+            try {
+              await firebaseService.updateOrderStatus(orderId, 'failed');
+              await loadOrders();
+            } catch (error) {
+              console.error('Error canceling order:', error);
+              Alert.alert('Lỗi', 'Không thể hủy đơn hàng');
+            }
           }
         }
       ]
     );
   };
 
-  // Thêm state để lưu thời gian còn lại cho mỗi đơn hàng
-  const [timeLeft, setTimeLeft] = useState({});
-
-  // Thêm useEffect để xử lý đếm ngược
+  // Timer effect
   useEffect(() => {
-    // Khởi tạo thời gian cho các đơn unpaid
-    const initialTimeLeft = {};
-    orders.forEach(order => {
-      if (order.status === 'unpaid') {
-        initialTimeLeft[order.id] = 300; // 5 phút = 300 giây
-      }
-    });
-    setTimeLeft(initialTimeLeft);
-
-    // Tạo interval để đếm ngược
-    const timer = setInterval(() => {
+    const timer = setInterval(async () => {
       setTimeLeft(prevTime => {
         const newTime = { ...prevTime };
         let needsUpdate = false;
 
-        // Cập nhật thời gian và kiểm tra hết giờ
         Object.keys(newTime).forEach(orderId => {
           if (newTime[orderId] > 0) {
             newTime[orderId] -= 1;
             if (newTime[orderId] === 0) {
-              // Tự động hủy đơn khi hết thời gian
-              setOrders(prevOrders =>
-                prevOrders.map(order =>
-                  order.id === orderId
-                    ? { ...order, status: 'failed' }
-                    : order
-                )
-              );
+              // Auto cancel order when time runs out
+              firebaseService.updateOrderStatus(orderId, 'failed')
+                .then(() => loadOrders())
+                .catch(error => console.error('Error auto-canceling order:', error));
             }
             needsUpdate = true;
           }
@@ -133,7 +130,6 @@ const ActivitiesPage = () => {
       });
     }, 1000);
 
-    // Cleanup timer
     return () => clearInterval(timer);
   }, []);
 

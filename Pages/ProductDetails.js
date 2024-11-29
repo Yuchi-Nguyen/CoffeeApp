@@ -56,7 +56,6 @@ const ProductDetails = ({ route, navigation }) => {
 
       await firebaseService.addToCart(user.uid, productData);
       Alert.alert('Thành công', 'Đã thêm sản phẩm vào giỏ hàng');
-      navigation.navigate('Cart');
     } catch (error) {
       console.error('Error adding to cart:', error);
       Alert.alert('Lỗi', 'Không thể thêm vào giỏ hàng. Vui lòng thử lại sau.');

@@ -135,8 +135,67 @@ const CartScreen = () => {
       Alert.alert('Invalid Code', 'Please enter a valid discount code.');
     }
   };
-  const handlePlaceOrder = () => {
-    alert("Đơn hàng của bạn đã được đặt thành công!");
+  const handlePlaceOrder = async () => {
+    try {
+      if (!orderType) {
+        Alert.alert('Thông báo', 'Vui lòng chọn hình thức đặt hàng');
+        return;
+      }
+
+      Alert.alert(
+        "Xác nhận đặt hàng",
+        "Bạn có muốn thanh toán ngay không?",
+        [
+          {
+            text: "Hủy",
+            style: "cancel"
+          },
+          {
+            text: "Thanh toán sau",
+            onPress: async () => {
+              const orderData = {
+                serviceType: orderType,
+                items: cartItems,
+                location: "Khu Phố 6, Linh Trung Thủ Đức",
+                total: calculateTotal(),
+                time: time,
+                status: 'unpaid'
+              };
+              await firebaseService.createOrder(user.uid, orderData);
+              await firebaseService.clearCart(user.uid); // Xóa giỏ hàng
+              Alert.alert('Thành công', 'Đơn hàng của bạn đã được tạo');
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Activities' }],
+              });
+            }
+          },
+          {
+            text: "Thanh toán ngay",
+            onPress: async () => {
+              const orderData = {
+                serviceType: orderType,
+                items: cartItems,
+                location: "Khu Phố 6, Linh Trung Thủ Đức",
+                total: calculateTotal(),
+                time: time,
+                status: 'paid'
+              };
+              await firebaseService.createOrder(user.uid, orderData);
+              await firebaseService.clearCart(user.uid); // Xóa giỏ hàng
+              Alert.alert('Thành công', 'Đơn hàng đã được thanh toán');
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Activities' }],
+              });
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Error placing order:', error);
+      Alert.alert('Lỗi', 'Không thể đặt hàng. Vui lòng thử lại sau.');
+    }
   };
 
   return (
