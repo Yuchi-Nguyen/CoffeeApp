@@ -7,9 +7,10 @@ import ActivitiesPage from '../Pages/ActivitiesPage';
 import StoresPage from '../Pages/StoresPage';
 import OthersPage from '../Pages/OthersPage';
 import ProductDetails from '../Pages/ProductDetails';
+import CartScreen from '../Pages/Cart';
 import Feather from 'react-native-vector-icons/Feather';
 import { View } from 'react-native';
-import CartScreen from '../Pages/Cart';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -19,6 +20,7 @@ function HomeStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen name="ProductDetails" component={ProductDetails} />
+      <Stack.Screen name="Cart" component={CartScreen} />
     </Stack.Navigator>
   );
 }
@@ -27,14 +29,9 @@ function HomeStack() {
 function OrderStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen 
-        name="OrderScreen" 
-        component={OrderPage}
-      />
-      <Stack.Screen 
-        name="ProductDetails" 
-        component={ProductDetails} 
-      />
+      <Stack.Screen name="OrderScreen" component={OrderPage} />
+      <Stack.Screen name="ProductDetails" component={ProductDetails} />
+      <Stack.Screen name="Cart" component={CartScreen} />
     </Stack.Navigator>
   );
 }
@@ -46,20 +43,17 @@ export default function MainBottom() {
         headerShown: false,
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          if (route.name === 'Trang chủ') {
+          if (route.name === 'Home') {
             iconName = 'home';
-          } else if (route.name === 'Đặt hàng') {
+          } else if (route.name === 'Order') {
             iconName = 'coffee';
-          } else if (route.name === 'Hoạt động') {
+          } else if (route.name === 'Activities') {
             iconName = 'clock';
-          } else if (route.name === 'Cửa hàng') {
+          } else if (route.name === 'Stores') {
             iconName = 'map-pin';
-          } else if (route.name === 'Khác') {
+          } else if (route.name === 'Others') {
             iconName = 'menu';
-          } 
-          // else if (route.name === 'Cart') {
-          //   iconName = 'shopping-cart';
-          // }
+          }
           return (
             <View style={{ position: 'relative' }}>
               <Feather name={iconName} size={size} color={color} />
@@ -73,12 +67,11 @@ export default function MainBottom() {
           borderTopWidth: 0,
         },
       })}>
-      <Tab.Screen name="Trang chủ" component={HomeStack} />
-      <Tab.Screen name="Đặt hàng" component={OrderStack} />
-      <Tab.Screen name="Hoạt động" component={ActivitiesPage} />
-      <Tab.Screen name="Cửa hàng" component={StoresPage} />
-      <Tab.Screen name="Khác" component={OthersPage} />
-      {/* <Tab.Screen name='Cart' component={CartScreen}/> */}
+      <Tab.Screen name="Home" component={HomeStack} />
+      <Tab.Screen name="Order" component={OrderStack} />
+      <Tab.Screen name="Activities" component={ActivitiesPage} />
+      <Tab.Screen name="Stores" component={StoresPage} />
+      <Tab.Screen name="Others" component={OthersPage} />
     </Tab.Navigator>
   );
 }

@@ -66,7 +66,7 @@ const Home = () => {
   }, []);
 
   const handleCategoryPress = (categoryId) => {
-    navigation.navigate('Đặt hàng', {
+    navigation.navigate('Order', {
       screen: 'OrderScreen',
       params: { selectedCategoryId: categoryId }
     });
