@@ -211,14 +211,14 @@ const ProfileEdit = () => {
               {/* Date of Birth */}
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Ngày Sinh</Text>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={[styles.input, isEditable ? styles.editable : null]}
                   onPress={() => isEditable && setShowDatePicker(true)}
                 >
                   <Text style={styles.inputValue}>{profile.birthDate}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 
-                {showDatePicker && (
+                {/* {showDatePicker && (
                   <DateTimePicker
                     value={new Date(profile.birthDate)}
                     mode="date"
@@ -232,7 +232,16 @@ const ProfileEdit = () => {
                     }}
                     is24Hour={true}
                   />
-                )}
+                )} */}
+                <DateTimePicker
+                  value={new Date(profile.birthDate)}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                  is24Hour={true}
+                  disabled={disableDatePicker} // disable DateTimePicker based on disableDatePicker state
+                  style={{marginLeft: '-10'}}
+                />
               </View>
             </View>
 
@@ -288,18 +297,21 @@ const ProfileEdit = () => {
               style={styles.modalOption}
               onPress={() => handleGenderSelect('Nam')}
             >
+              <Feather name="user" size={20} color="#007AFF" />
               <Text style={styles.modalText}>Nam</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
               onPress={() => handleGenderSelect('Nữ')}
             >
+              <Feather name="user" size={20} color="#FF69B4" />
               <Text style={styles.modalText}>Nữ</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
               onPress={() => handleGenderSelect('Khác')}
             >
+              <Feather name="help-circle" size={20} color="#666" />
               <Text style={styles.modalText}>Khác</Text>
             </TouchableOpacity>
             <TouchableOpacity
