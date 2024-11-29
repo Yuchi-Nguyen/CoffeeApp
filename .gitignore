@@ -1,13 +1,18 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # dependencies
-node_modules/
+/node_modules
+/.pnp
+.pnp.js
 
 # Expo
 .expo/
 dist/
 web-build/
 expo-env.d.ts
+
+# testing
+coverage
 
 # Native
 *.orig.*
@@ -29,8 +34,40 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+config/firebase.js
 
-# typescript
-*.tsbuildinfo
+# Keys and certificates
+*.key
+*.pem
+*.p8
+*.p12
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# Build and dependencies
+node_modules/
+dist/
+build/
+.expo/
+web-build/
+
+# Debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+debug.log
+
+# IDE
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

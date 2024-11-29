@@ -3,8 +3,9 @@ import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, ScrollView, 
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Swiper from 'react-native-swiper';
 import Header from '../Components/Header';
-import { Data } from '../Data';
 import { useNavigation } from '@react-navigation/native';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 const Home = () => {
   const navigation = useNavigation();
@@ -12,13 +13,56 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [promotions, setPromotions] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Lấy dữ liệu từ Data.js
-    setBanners(Data.banners);
-    setCategories(Data.categories);
-    setPromotions(Data.promotions);
-    setBestSellers(Data.bestSellers);
+    const fetchData = async () => {
+      try {
+        // Fetch banners
+        const bannersSnapshot = await getDocs(collection(db, 'banners'));
+        const bannersData = bannersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setBanners(bannersData);
+
+        // Fetch categories
+        const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        const sortedCategories = categoriesData.sort((a, b) => {
+          const idA = parseInt(a.id);
+          const idB = parseInt(b.id);
+          return idA - idB;
+        });
+        setCategories(sortedCategories);
+
+        // Fetch promotions
+        const promotionsSnapshot = await getDocs(collection(db, 'promotions'));
+        const promotionsData = promotionsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setPromotions(promotionsData);
+
+        // Fetch bestSellers
+        const bestSellersSnapshot = await getDocs(collection(db, 'bestSellers'));
+        const bestSellersData = bestSellersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setBestSellers(bestSellersData);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleCategoryPress = (categoryId) => {
@@ -30,6 +74,10 @@ const Home = () => {
 
   const handleProductPress = (product) => {
     navigation.navigate('ProductDetails', { product });
+  };
+
+  const formatCurrency = (amount) => {
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫";
   };
 
   return (
@@ -98,7 +146,7 @@ const Home = () => {
               >
                 <Image source={{ uri: item.image }} style={styles.productImage} />
                 <Text style={styles.productName}>{item.name}</Text>
-                <Text style={styles.productPrice}>{item.price} đ</Text>
+                <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
               </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id.toString()}
