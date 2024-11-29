@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,16 +10,68 @@ import {
   Image,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { stores } from '../Data';
 import moment from 'moment';
-import Header from '../Components/Header';  // Import Header component
-import Feather from 'react-native-vector-icons/Feather';  // For icons
-import Ionicons from 'react-native-vector-icons/Ionicons'; // For additional icons
+import Header from '../Components/Header';
+import Feather from 'react-native-vector-icons/Feather';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';  // Đảm bảo đường dẫn đúng
 
 const StoresPage = () => {
   const [searchText, setSearchText] = useState('');
-  const [currentView, setCurrentView] = useState('list'); // 'list' hoặc 'map'
+  const [currentView, setCurrentView] = useState('list');
+  const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch stores từ Firebase khi component mount
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const storesSnapshot = await getDocs(collection(db, 'stores'));
+        const storesData = storesSnapshot.docs.map(doc => ({
+          ...doc.data(),
+          // Đảm bảo location là object với latitude và longitude
+          location: {
+            latitude: doc.data().location.latitude,
+            longitude: doc.data().location.longitude
+          }
+        }));
+        setStores(storesData);
+        
+        // Kiểm tra selectedStore từ AsyncStorage
+        const savedStoreId = await AsyncStorage.getItem('selectedStoreId');
+        if (savedStoreId) {
+          const store = storesData.find(s => s.id === savedStoreId);
+          if (store) {
+            setSelectedStore(store);
+          } else {
+            setSelectedStore(storesData[0]); // Mặc định store đầu tiên
+          }
+        } else {
+          setSelectedStore(storesData[0]); // Mặc định store đầu tiên
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchStores();
+  }, []);
+
+  // Hàm xử lý khi chọn cửa hàng
+  const handleStoreSelect = async (store) => {
+    setSelectedStore(store);
+    try {
+      await AsyncStorage.setItem('selectedStoreId', store.id);
+    } catch (error) {
+      console.error('Error saving selected store:', error);
+    }
+  };
 
   // Hàm kiểm tra trạng thái mở cửa
   const isOpen = (openHours) => {
@@ -39,6 +91,14 @@ const StoresPage = () => {
   const sortedStores = selectedStore
     ? [selectedStore, ...filteredStores.filter(store => store.id !== selectedStore.id)]
     : filteredStores;
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Đang tải dữ liệu...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -75,7 +135,7 @@ const StoresPage = () => {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[styles.storeItem, selectedStore && selectedStore.id === item.id ? styles.selectedItem : {}]}
-              onPress={() => setSelectedStore(item)}
+              onPress={() => handleStoreSelect(item)}
             >
               <View style={styles.storeContent}>
                 {/* Ảnh cửa hàng */}

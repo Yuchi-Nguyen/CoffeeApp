@@ -6,7 +6,28 @@ import { AuthContext } from '../context/AuthContext';
 export default function LoginPage({ navigation }) {
   const [emailValue, setEmailValue] = useState('');
   const [passwordValue, setPasswordValue] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
+
+  const handleLogin = async () => {
+    if (!emailValue || !passwordValue) {
+      alert('Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const success = await login(emailValue, passwordValue);
+      if (!success) {
+        // Thông báo lỗi đã được xử lý trong hàm login
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Đã có lỗi xảy ra khi đăng nhập');
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -51,9 +72,12 @@ export default function LoginPage({ navigation }) {
 
               <View style={styles.buttonContainer}>
                 <Pressable
-                  onPress={() => login(emailValue, passwordValue)}
-                  style={styles.loginButton}>
-                  <Text style={styles.buttonText}>Đăng Nhập</Text>
+                  onPress={handleLogin}
+                  disabled={loading}
+                  style={[styles.loginButton, loading && styles.loginButtonDisabled]}>
+                  <Text style={styles.buttonText}>
+                    {loading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
+                  </Text>
                 </Pressable>
               </View>
 
@@ -66,7 +90,7 @@ export default function LoginPage({ navigation }) {
               </View>
 
               <Pressable onPress={() => navigation.navigate('Register')}>
-                <Text style={styles.registerText}>Chưa có tài khoảng? <Text style={styles.registerTextBold}>Đăng Ký!</Text></Text>
+                <Text style={styles.registerText}>Chưa có tài khoản? <Text style={styles.registerTextBold}>Đăng Ký!</Text></Text>
               </Pressable>
             </View>
           </View>
@@ -141,18 +165,20 @@ const styles = StyleSheet.create({
   loginWithHeader: {
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 20
+    marginVertical: 20,
+    color: '#666',
   },
 
   loginWithLogoContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: 120
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   loginWithLogo: {
-    width: 60,
-    height: 60,
+    width: 40,
+    height: 40,
+    marginHorizontal: 15,
   },
 
   registerText: {
@@ -164,5 +190,9 @@ const styles = StyleSheet.create({
   registerTextBold: {
     fontWeight: 'bold',
     color: 'blue',
-  }
+  },
+
+  loginButtonDisabled: {
+    opacity: 0.7,
+  },
 });
