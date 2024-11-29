@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
@@ -172,6 +172,18 @@ const ActivitiesPage = () => {
           </View>
         </View>
       </View>
+
+      {/* Thông tin cửa hàng */}
+      {order.store && (
+        <View style={styles.storeInfo}>
+          <Image source={{ uri: order.store.image }} style={styles.storeImage} />
+          <View style={styles.storeDetails}>
+            <Text style={styles.storeName}>{order.store.name}</Text>
+            <Text style={styles.storeAddress}>{order.store.address}</Text>
+            <Text style={styles.storePhone}>{order.store.phone}</Text>
+          </View>
+        </View>
+      )}
 
       {/* Chi tiết đơn hàng */}
       <View style={styles.orderDetails}>
@@ -359,6 +371,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 4,
     textAlign: 'right',
+  },
+  storeInfo: {
+    flexDirection: 'row',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    alignItems: 'center',
+  },
+  storeImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  storeDetails: {
+    flex: 1,
+  },
+  storeName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  storeAddress: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 2,
+  },
+  storePhone: {
+    fontSize: 14,
+    color: '#666',
   },
 });
 

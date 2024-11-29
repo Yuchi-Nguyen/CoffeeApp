@@ -17,7 +17,7 @@ const countryData = Object.keys(countries).map((key) => ({
     flag: getEmojiFlag(key),
 }));
 
-const CountryCode = ({ editable }) => {
+const CountryCode = ({ editable = true, selectedCode, onSelectCountry }) => {
     const vietnamIndex = countryData.findIndex(
         (country) => country.name === 'Vietnam'
     );
@@ -32,6 +32,9 @@ const CountryCode = ({ editable }) => {
 
     const handleSelectCountry = (country) => {
         setSelectedCountry(country);
+        if (onSelectCountry) {
+            onSelectCountry(country.code);
+        }
         setModalVisible(false);
     };
 
