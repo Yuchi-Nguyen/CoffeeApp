@@ -18,13 +18,13 @@ const ProductDetails = ({ route, navigation }) => {
   const [specialInstructions, setSpecialInstructions] = useState('');
 
   // Tính tổng tiền
+  const formatCurrency = (amount) => {
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫";
+  };
+
   const calculateTotal = () => {
     const total = parseFloat(product.price) * quantity;
-    // Định dạng theo tiền tệ Việt Nam
-    return total.toLocaleString('vi-VN', {
-      minimumFractionDigits: 3,
-      maximumFractionDigits: 3
-    }).replace(/,/g, '.').replace(/\./g, ',');
+    return formatCurrency(total);
   };
 
   // Định dạng giá sản phẩm đơn lẻ
@@ -65,7 +65,7 @@ const ProductDetails = ({ route, navigation }) => {
             <View style={styles.header}>
               <Text style={styles.productName}>{product.name}</Text>
               <Text style={styles.productPrice}>
-                {formatPrice(product.price)} đ
+                {formatCurrency(product.price)}
               </Text>
             </View>
             <Text style={styles.productDescription}>{product.description}</Text>
@@ -102,7 +102,7 @@ const ProductDetails = ({ route, navigation }) => {
             {/* Nút Thêm Vào Giỏ Hàng */}
             <TouchableOpacity style={styles.addButton} onPress={handleAddToCart}>
               <Text style={styles.addButtonText}>
-                ADD {calculateTotal()} đ
+                ADD {calculateTotal()}
               </Text>
             </TouchableOpacity>
           </View>

@@ -11,8 +11,8 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../Components/Header';
-import { Data } from '../Data';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
 const VIEW_MODES = {
@@ -23,23 +23,69 @@ const VIEW_MODES = {
 const OrderPage = ({ navigation }) => {
   const route = useRoute();
   const [selectedCategory, setSelectedCategory] = useState(1);
-  const [viewMode, setViewMode] = useState(VIEW_MODES.LIST); // 'list' hoặc 'grid'
-  const [searchText, setSearchText] = useState(''); // Nội dung tìm kiếm
+  const [viewMode, setViewMode] = useState(VIEW_MODES.LIST);
+  const [searchText, setSearchText] = useState('');
   const [orderType, setOrderType] = useState('Dine-in');
   const [showOrderTypeModal, setShowOrderTypeModal] = useState(false);
-  const slideAnim = useRef(new Animated.Value(300)).current; 
+  const slideAnim = useRef(new Animated.Value(300)).current;
+  
+  // Thêm state mới để lưu trữ dữ liệu từ Firestore
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
 
+  // Fetch categories từ Firestore và sắp xếp theo id
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        // Sắp xếp categories theo id
+        const sortedCategories = categoriesData.sort((a, b) => {
+          // Chuyển id thành số để so sánh
+          const idA = parseInt(a.id);
+          const idB = parseInt(b.id);
+          return idA - idB;
+        });
+        setCategories(sortedCategories);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Fetch products từ Firestore dựa trên category được chọn
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const productsRef = collection(db, 'products');
+        const q = query(productsRef, where('categoryId', '==', selectedCategory.toString()));
+        const productsSnapshot = await getDocs(q);
+        const productsData = productsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setProducts(productsData);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    fetchProducts();
+  }, [selectedCategory]);
+
+  // Cập nhật selectedCategory từ route params
   useEffect(() => {
     if (route.params?.selectedCategoryId) {
       setSelectedCategory(route.params.selectedCategoryId);
     }
   }, [route.params?.selectedCategoryId]);
 
-  // Lọc sản phẩm theo danh mục và từ khóa tìm kiếm
-  const filteredProducts = Data.products.filter(
-    (product) =>
-      product.categoryId === selectedCategory &&
-      product.name.toLowerCase().includes(searchText.toLowerCase())
+  // Lọc sản phẩm theo từ khóa tìm kiếm
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const showModal = () => {
@@ -68,6 +114,10 @@ const OrderPage = ({ navigation }) => {
     navigationCart.navigate('Cart');
   };
 
+  const formatCurrency = (amount) => {
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫";
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Thanh tìm kiếm */}
@@ -88,9 +138,9 @@ const OrderPage = ({ navigation }) => {
 
       {/* Danh mục sản phẩm */}
       <FlatList
-        data={Data.categories}
+        data={categories}
         horizontal
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.categoryList}
         style={{ flexGrow: 0 }}
@@ -117,7 +167,7 @@ const OrderPage = ({ navigation }) => {
         {/* Bộ lọc hiển thị */}
         <View style={styles.filterContainer}>
           <Text style={styles.categoryTitle}>
-            {Data.categories.find((cat) => cat.id === selectedCategory)?.name}
+            {categories.find((cat) => cat.id === selectedCategory)?.name}
           </Text>
           <View style={styles.viewModeButtons}>
             <TouchableOpacity onPress={() => setViewMode(VIEW_MODES.LIST)}>
@@ -167,7 +217,7 @@ const OrderPage = ({ navigation }) => {
                   </Text>
                 )}
                 <Text style={styles.productSKU}>{item.sku}</Text>
-                <Text style={styles.productPrice}>{item.price}</Text>
+                <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
               </View>
             </TouchableOpacity>
           )}
