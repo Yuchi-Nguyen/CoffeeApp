@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -13,9 +13,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { useNavigation } from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
+import { AuthContext } from '../context/AuthContext';
+import { firebaseService } from '../services/firebaseService';
 
 
 const CartScreen = () => {
+  const { user } = useContext(AuthContext);
   const navigation = useNavigation();
   const Header = () => (
     <View style={styles.headerContainer}>
@@ -64,15 +67,24 @@ const CartScreen = () => {
   };
 
   // State cho danh sách sản phẩm
-  const [cartItems, setCartItems] = useState([
-    { id: '1', name: 'Trà Sen Vàng', size: 'S', price: 50, quantity: 1 },
-    { id: '2', name: 'Frezze Trà Xanh', size: 'L', price: 50, quantity: 2 },
-    { id: '3', name: 'Phin Đen Đá', size: 'M', price: 20, quantity: 1 },
-    { id: '4', name: 'Phindi', size: 'M', price: 25, quantity: 1 },
-    { id: '5', name: 'Hồng Trà', size: 'M', price: 20, quantity: 1 },
-    { id: '6', name: 'Hồng Trà Chanh', size: 'XL', price: 40, quantity: 1 },
-    { id: '7', name: 'Hồng Trà Mật Ong', size: 'S', price: 20, quantity: 1 },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+
+  // Fetch cart items when component mounts
+  useEffect(() => {
+    loadCartItems();
+  }, [user]);
+
+  const loadCartItems = async () => {
+    try {
+      if (user) {
+        const items = await firebaseService.getCartItems(user.uid);
+        setCartItems(items);
+      }
+    } catch (error) {
+      console.error('Error loading cart items:', error);
+      Alert.alert('Lỗi', 'Không thể tải giỏ hàng. Vui lòng thử lại sau.');
+    }
+  };
 
   // State cho mã giảm giá
   const [discountCode, setDiscountCode] = useState('');
@@ -85,17 +97,33 @@ const CartScreen = () => {
   };
 
   // Cập nhật số lượng sản phẩm
-  const updateQuantity = (id, change) => {
-    const updatedItems = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity: Math.max(0, item.quantity + change) } : item
-    );
-    setCartItems(updatedItems);
+  const updateQuantity = async (id, change) => {
+    try {
+      const item = cartItems.find(item => item.id === id);
+      const newQuantity = Math.max(0, item.quantity + change);
+      
+      if (newQuantity === 0) {
+        await firebaseService.removeFromCart(id);
+      } else {
+        await firebaseService.updateCartItemQuantity(id, newQuantity);
+      }
+      
+      await loadCartItems(); // Reload cart items
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      Alert.alert('Lỗi', 'Không thể cập nhật số lượng. Vui lòng thử lại sau.');
+    }
   };
 
   // Xóa sản phẩm khỏi giỏ hàng
-  const removeItem = (id) => {
-    const updatedItems = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedItems);
+  const removeItem = async (id) => {
+    try {
+      await firebaseService.removeFromCart(id);
+      await loadCartItems(); // Reload cart items
+    } catch (error) {
+      console.error('Error removing item:', error);
+      Alert.alert('Lỗi', 'Không thể xóa sản phẩm. Vui lòng thử lại sau.');
+    }
   };
 
   // Áp dụng mã giảm giá
