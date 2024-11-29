@@ -1,5 +1,12 @@
 # Coffee App
 
+## Requirements
+
+- Node.js (v14 trở lên)
+- npm hoặc yarn
+- Expo CLI
+- React Native development environment
+
 ## Setup Instructions
 
 1. Clone repository: 
