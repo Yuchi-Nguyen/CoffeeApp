@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,18 @@ import {
   ScrollView,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useNavigation } from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
+import { AuthContext } from '../context/AuthContext';
+import { firebaseService } from '../services/firebaseService';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 
 const CartScreen = () => {
+  const { user } = useContext(AuthContext);
   const navigation = useNavigation();
   const Header = () => (
     <View style={styles.headerContainer}>
@@ -64,15 +70,24 @@ const CartScreen = () => {
   };
 
   // State cho danh sách sản phẩm
-  const [cartItems, setCartItems] = useState([
-    { id: '1', name: 'Trà Sen Vàng', size: 'S', price: 50, quantity: 1 },
-    { id: '2', name: 'Frezze Trà Xanh', size: 'L', price: 50, quantity: 2 },
-    { id: '3', name: 'Phin Đen Đá', size: 'M', price: 20, quantity: 1 },
-    { id: '4', name: 'Phindi', size: 'M', price: 25, quantity: 1 },
-    { id: '5', name: 'Hồng Trà', size: 'M', price: 20, quantity: 1 },
-    { id: '6', name: 'Hồng Trà Chanh', size: 'XL', price: 40, quantity: 1 },
-    { id: '7', name: 'Hồng Trà Mật Ong', size: 'S', price: 20, quantity: 1 },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+
+  // Fetch cart items when component mounts
+  useEffect(() => {
+    loadCartItems();
+  }, [user]);
+
+  const loadCartItems = async () => {
+    try {
+      if (user) {
+        const items = await firebaseService.getCartItems(user.uid);
+        setCartItems(items);
+      }
+    } catch (error) {
+      console.error('Error loading cart items:', error);
+      Alert.alert('Lỗi', 'Không thể tải giỏ hàng. Vui lòng thử lại sau.');
+    }
+  };
 
   // State cho mã giảm giá
   const [discountCode, setDiscountCode] = useState('');
@@ -84,18 +99,34 @@ const CartScreen = () => {
     return total - discount;
   };
 
-  // Cập nhật số lượng sản phẩm
-  const updateQuantity = (id, change) => {
-    const updatedItems = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity: Math.max(0, item.quantity + change) } : item
-    );
-    setCartItems(updatedItems);
+  // Cập nhật số lượng s���n phẩm
+  const updateQuantity = async (id, change) => {
+    try {
+      const item = cartItems.find(item => item.id === id);
+      const newQuantity = Math.max(0, item.quantity + change);
+      
+      if (newQuantity === 0) {
+        await firebaseService.removeFromCart(id);
+      } else {
+        await firebaseService.updateCartItemQuantity(id, newQuantity);
+      }
+      
+      await loadCartItems(); // Reload cart items
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      Alert.alert('Lỗi', 'Không thể cập nhật số lượng. Vui lòng thử lại sau.');
+    }
   };
 
   // Xóa sản phẩm khỏi giỏ hàng
-  const removeItem = (id) => {
-    const updatedItems = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedItems);
+  const removeItem = async (id) => {
+    try {
+      await firebaseService.removeFromCart(id);
+      await loadCartItems(); // Reload cart items
+    } catch (error) {
+      console.error('Error removing item:', error);
+      Alert.alert('Lỗi', 'Không thể xóa sản phẩm. Vui lòng thử lại sau.');
+    }
   };
 
   // Áp dụng mã giảm giá
@@ -107,8 +138,111 @@ const CartScreen = () => {
       Alert.alert('Invalid Code', 'Please enter a valid discount code.');
     }
   };
-  const handlePlaceOrder = () => {
-    alert("Đơn hàng của bạn đã được đặt thành công!");
+
+  const [selectedStore, setSelectedStore] = useState(null);
+
+  // Thêm useEffect để lấy thông tin cửa hàng đã chọn
+  useEffect(() => {
+    const getSelectedStore = async () => {
+      try {
+        const storeId = await AsyncStorage.getItem('selectedStoreId');
+        if (storeId) {
+          const storesSnapshot = await getDocs(collection(db, 'stores'));
+          const stores = storesSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          const store = stores.find(s => s.id === storeId);
+          setSelectedStore(store);
+        }
+      } catch (error) {
+        console.error('Error getting selected store:', error);
+      }
+    };
+
+    getSelectedStore();
+  }, []);
+
+  const handlePlaceOrder = async () => {
+    try {
+      if (!orderType) {
+        Alert.alert('Thông báo', 'Vui lòng chọn hình thức đặt hàng');
+        return;
+      }
+
+      if (!selectedStore) {
+        Alert.alert('Thông báo', 'Vui lòng chọn cửa hàng trong mục Stores');
+        return;
+      }
+
+      Alert.alert(
+        "Xác nhận đặt hàng",
+        "Bạn có muốn thanh toán ngay không?",
+        [
+          {
+            text: "Hủy",
+            style: "cancel"
+          },
+          {
+            text: "Thanh toán sau",
+            onPress: async () => {
+              const orderData = {
+                serviceType: orderType,
+                items: cartItems,
+                location: selectedStore.address,
+                store: {
+                  id: selectedStore.id,
+                  name: selectedStore.name,
+                  address: selectedStore.address,
+                  phone: selectedStore.phone,
+                  image: selectedStore.image
+                },
+                total: calculateTotal(),
+                time: time,
+                status: 'unpaid'
+              };
+              await firebaseService.createOrder(user.uid, orderData);
+              await firebaseService.clearCart(user.uid);
+              Alert.alert('Thành công', 'Đơn hàng của bạn đã được tạo');
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Activities' }],
+              });
+            }
+          },
+          {
+            text: "Thanh toán ngay",
+            onPress: async () => {
+              const orderData = {
+                serviceType: orderType,
+                items: cartItems,
+                location: selectedStore.address,
+                store: {
+                  id: selectedStore.id,
+                  name: selectedStore.name,
+                  address: selectedStore.address,
+                  phone: selectedStore.phone,
+                  image: selectedStore.image
+                },
+                total: calculateTotal(),
+                time: time,
+                status: 'paid'
+              };
+              await firebaseService.createOrder(user.uid, orderData);
+              await firebaseService.clearCart(user.uid);
+              Alert.alert('Thành công', 'Đơn hàng đã được thanh toán');
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Activities' }],
+              });
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Error placing order:', error);
+      Alert.alert('Lỗi', 'Không thể đặt hàng. Vui lòng thử lại sau.');
+    }
   };
 
   return (
@@ -270,6 +404,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+    marginTop: 50,
   },
   scrollContent: {
     flex: 1,

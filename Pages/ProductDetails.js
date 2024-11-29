@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,14 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AuthContext } from '../context/AuthContext';
+import { firebaseService } from '../services/firebaseService';
 
 const ProductDetails = ({ route, navigation }) => {
+  const { user } = useContext(AuthContext);
   const { product } = route.params; 
   const [quantity, setQuantity] = useState(1);
   const [specialInstructions, setSpecialInstructions] = useState('');
@@ -35,14 +39,27 @@ const ProductDetails = ({ route, navigation }) => {
     }).replace(/,/g, '.').replace(/\./g, ',');
   };
 
-  const handleAddToCart = () => {
-    // Thêm vào giỏ hàng
-    console.log('Added to cart:', {
-      product,
-      quantity,
-      specialInstructions,
-      total: parseFloat(product.price) * quantity
-    });
+  const handleAddToCart = async () => {
+    try {
+      if (!user) {
+        Alert.alert('Thông báo', 'Vui lòng đăng nhập để thêm vào giỏ hàng');
+        return;
+      }
+
+      const productData = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+        specialInstructions: specialInstructions
+      };
+
+      await firebaseService.addToCart(user.uid, productData);
+      Alert.alert('Thành công', 'Đã thêm sản phẩm vào giỏ hàng');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      Alert.alert('Lỗi', 'Không thể thêm vào giỏ hàng. Vui lòng thử lại sau.');
+    }
   };
 
   return (
@@ -116,6 +133,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f8f8',
+    marginTop: 38,
   },
   closeButton: {
     position: 'absolute',

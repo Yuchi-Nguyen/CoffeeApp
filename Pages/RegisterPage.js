@@ -155,6 +155,7 @@ export default function RegisterPage({ navigation }) {
               <CountryCode 
                 selectedCode={selectedCountryCode}
                 onSelectCountry={(code) => setSelectedCountryCode(code)}
+                editable={true}
               />
               <View style={[styles.inputContainer, styles.phoneInput]}>
                 <TextInput
