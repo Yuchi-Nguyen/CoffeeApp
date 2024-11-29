@@ -19,6 +19,7 @@ const OthersPage = () => {
   const [disableDatePicker, setDisableDatePicker] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [profile, setProfile] = useState({
+    displayName: '',
     firstName: '',
     lastName: '',
     gender: '',
@@ -41,6 +42,7 @@ const OthersPage = () => {
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setProfile({
+              displayName: userData.displayName || '',
               firstName: userData.firstName || '',
               lastName: userData.lastName || '',
               gender: userData.gender || '',
@@ -116,7 +118,7 @@ const OthersPage = () => {
   return (
     <>
       <Header
-        userName={`${profile.firstName} ${profile.lastName}`}
+        userName={profile.displayName || `${profile.firstName} ${profile.lastName}`}
         memberLevel="MEMBER"
         drips={profile.drips}
         prepaid={profile.prepaid}
