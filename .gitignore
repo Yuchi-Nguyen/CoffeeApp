@@ -34,3 +34,43 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Firebase config
+config/firebase.js
+.env
+
+# Config files
+config/firebase.js
+*.env
+.env*
+.env.local
+.env.development
+.env.production
+
+# Keys and certificates
+*.key
+*.pem
+*.p8
+*.p12
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# Build and dependencies
+node_modules/
+dist/
+build/
+.expo/
+web-build/
+
+# Debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+debug.log
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo

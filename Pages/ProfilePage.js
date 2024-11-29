@@ -1,38 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, TextInput, ScrollView, TouchableOpacity, Modal, Pressable } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, TextInput, ScrollView, TouchableOpacity, Modal, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { AuthContext } from '../context/AuthContext';
 import CountryCode from '../Components/CountryCode';
 import Header from '../Components/UserInfoHeader';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import * as FileSystem from 'expo-file-system';
+import { updateProfile } from 'firebase/auth';
+import { auth } from '../config/firebase';
 
 const ProfileEdit = () => {
+  const { user } = useContext(AuthContext);
   const [isEditable, setIsEditable] = useState(false);
-  const [showGenderModal, setShowGenderModal] = useState(false); // Modal to choose gender
-  const [selectedGender, setSelectedGender] = useState('Nam'); // Default gender
-  const [disableDatePicker, setDisableDatePicker] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
-
-  // State lưu thông tin
+  const [showGenderModal, setShowGenderModal] = useState(false);
+  const [disableDatePicker, setDisableDatePicker] = useState(true);
   const [profile, setProfile] = useState({
-    firstName: 'Uchiha',
-    lastName: 'Obito',
-    gender: 'Nam', // Mặc định là Nam
-    birthDate: '2004-08-08',
-    phone: '0123456789',
-    email: 'obitouchiha@gmail.com',
+    firstName: '',
+    lastName: '',
+    gender: '',
+    birthDate: new Date().toISOString().split('T')[0],
+    phoneNumber: {
+      countryCode: '+84',
+      number: ''
+    },
+    email: '',
+    drips: 0,
+    prepaid: 0
   });
+
+  // Fetch dữ liệu khi component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user?.uid) {
+        setIsLoading(true);
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setProfile({
+              firstName: userData.firstName || '',
+              lastName: userData.lastName || '',
+              gender: userData.gender || '',
+              birthDate: userData.birthDate || new Date().toISOString().split('T')[0],
+              phoneNumber: {
+                countryCode: userData.phoneNumber?.countryCode || '+84',
+                number: userData.phoneNumber?.number || ''
+              },
+              email: userData.email || '',
+              drips: userData.drips || 0,
+              prepaid: userData.prepaid || 0
+            });
+
+            // Kiểm tra avatar sau khi lấy dữ liệu
+            const avatarPath = `${FileSystem.documentDirectory}avatars/avatar_${user.uid}.jpg`;
+            const fileInfo = await FileSystem.getInfoAsync(avatarPath);
+            if (fileInfo.exists) {
+              setAvatarKey(Date.now()); // Force re-render nếu có avatar
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
 
   // Hàm xử lý thay đổi thông tin
   const handleInputChange = (field, value) => {
     setProfile({ ...profile, [field]: value });
   };
 
-  const handleGenderSelect = (gender) => {
-    setSelectedGender(gender);
-    setProfile({ ...profile, gender });
-    setShowGenderModal(false); // Close modal after selecting gender
+  const handleGenderSelect = (selectedGender) => {
+    handleInputChange('gender', selectedGender);
+    setShowGenderModal(false);
   };
 
   const handleDateChange = (event, selectedDate) => {
@@ -43,19 +92,56 @@ const ProfileEdit = () => {
   };
 
   useEffect(() => {
-    setDisableDatePicker(!isEditable); // Nếu isEditable là true, disableDatePicker sẽ là false
+    setDisableDatePicker(!isEditable);
   }, [isEditable]);
+
+  // Thêm hàm để cập nhật thông tin lên Firebase
+  const handleSaveChanges = async () => {
+    if (user?.uid) {
+      try {
+        setIsLoading(true);
+        
+        // Cập nhật tất cả thông tin trong Firestore, bao gồm displayName
+        await updateDoc(doc(db, 'users', user.uid), {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          gender: profile.gender,
+          birthDate: profile.birthDate,
+          phoneNumber: profile.phoneNumber,
+          email: profile.email,
+          displayName: `${profile.firstName} ${profile.lastName}`  // Thêm displayName
+        });
+
+        setIsEditable(false);
+      } catch (error) {
+        console.error('Error updating user data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
 
   // Thêm navigation
   const navigation = useNavigation();
 
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#e77105" />
+      </View>
+    );
+  }
+
   return (
-    <>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
       <Header
-        userName="Uchiha Obito"
+        userName={`${profile.firstName} ${profile.lastName}`}
         memberLevel="MEMBER"
-        drips={120}
-        prepaid={5000}
+        drips={profile.drips}
+        prepaid={profile.prepaid}
       />
       <View style={styles.container}>
         {/* Header với nút back */}
@@ -71,7 +157,13 @@ const ProfileEdit = () => {
           </View>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => setIsEditable(!isEditable)}
+            onPress={() => {
+              if (isEditable) {
+                handleSaveChanges();
+              } else {
+                setIsEditable(true);
+              }
+            }}
           >
             <Feather name={isEditable ? 'check' : 'edit-2'} size={20} color="#fff" />
           </TouchableOpacity>
@@ -147,15 +239,24 @@ const ProfileEdit = () => {
             {/* Số điện thoại */}
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>Số Điện Thoại</Text>
-              <View style={styles.row}>
-                <CountryCode />
-                <View style={[styles.inputContainer, styles.phoneContainer]}>
-                  <TextInput
-                    style={[styles.input, styles.nonEditable]}
-                    value={profile.phone}
-                    editable={false} // Không thể sửa
-                  />
-                </View>
+              <View style={styles.phoneRowWrapper}>
+                <CountryCode 
+                  style={styles.countryCodeContainer}
+                  editable={isEditable}
+                  value={profile.phoneNumber.countryCode}
+                  onSelect={(code) => handleInputChange('phoneNumber', { countryCode: code })}
+                />
+                <TextInput
+                  style={[
+                    styles.input, 
+                    isEditable ? styles.editable : styles.nonEditable,
+                    styles.phoneInput
+                  ]}
+                  value={profile.phoneNumber.number}
+                  onChangeText={(text) => handleInputChange('phoneNumber', { number: text })}
+                  editable={isEditable}
+                  keyboardType="numeric"
+                />
               </View>
             </View>
 
@@ -176,8 +277,8 @@ const ProfileEdit = () => {
       {/* Gender Selection Modal */}
       <Modal
         visible={showGenderModal}
-        animationType="slide"
         transparent={true}
+        animationType="slide"
         onRequestClose={() => setShowGenderModal(false)}
       >
         <View style={styles.modalOverlay}>
@@ -187,33 +288,30 @@ const ProfileEdit = () => {
               style={styles.modalOption}
               onPress={() => handleGenderSelect('Nam')}
             >
-              <Feather name="user" size={20} color="#007bff" />
               <Text style={styles.modalText}>Nam</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
               onPress={() => handleGenderSelect('Nữ')}
             >
-              <Feather name="user" size={20} color="#ff69b4" />
               <Text style={styles.modalText}>Nữ</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleGenderSelect('Không Nói')}
+              onPress={() => handleGenderSelect('Khác')}
             >
-              <Feather name="help-circle" size={20} color="#ccc" />
-              <Text style={styles.modalText}>Không Nói</Text>
+              <Text style={styles.modalText}>Khác</Text>
             </TouchableOpacity>
-            <Pressable
+            <TouchableOpacity
               style={styles.modalCloseButton}
               onPress={() => setShowGenderModal(false)}
             >
               <Text style={styles.modalCloseText}>Đóng</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    </>
+      </KeyboardAvoidingView>
   );
 };
 
@@ -254,17 +352,18 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: '#f5f5f5',
     overflow: 'hidden',
-    marginTop: 40
+    marginTop: 40,
+    paddingVertical: 20
   },
   content: {
-    padding: 15,
+    padding: 20,
     overflow: 'hidden'
   },
   section: {
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
+    padding: 20,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -274,31 +373,48 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 7,
+    marginBottom: 15,
     color: '#333',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 15,
+    alignItems: 'center',
   },
   inputContainer: {
     flex: 1,
-    marginRight: 10,
+    marginRight: 0,
+    marginBottom: 15,
   },
   phoneContainer: {
-    marginTop: 13
+    flex: 1,
+    height: 40,
+    alignSelf: 'center',
+  },
+  countryCodeContainer: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
   },
   inputLabel: {
     fontSize: 14,
-    marginBottom: 5,
+    marginBottom: 8,
     color: '#666',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     fontSize: 14,
     color: '#333',
     backgroundColor: '#f9f9f9',
@@ -364,7 +480,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 436,
     left: 20
-  }
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  phoneRowWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  phoneInput: {
+    flex: 0.8,
+    height: 40,
+    marginBottom: 0,
+  },
 });
 
 export default ProfileEdit;

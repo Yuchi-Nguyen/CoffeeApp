@@ -17,7 +17,7 @@ const countryData = Object.keys(countries).map((key) => ({
     flag: getEmojiFlag(key),
 }));
 
-const CountryCode = () => {
+const CountryCode = ({ editable }) => {
     const vietnamIndex = countryData.findIndex(
         (country) => country.name === 'Vietnam'
     );
@@ -47,14 +47,15 @@ const CountryCode = () => {
     );
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { flex: 0.45 }]}>
             <TouchableOpacity
                 style={styles.selectedCountry}
                 onPress={() => setModalVisible(true)}
+                disabled={!editable}
             >
                 <Text style={styles.flag}>{selectedCountry.flag}</Text>
                 <Text style={styles.countryCode}>{selectedCountry.code}</Text>
-                <Feather name="chevron-down" size={20} color="#000" />
+                <Feather name="chevron-down" size={20} color="#6a6a6a" style={{ marginLeft: 'auto' }} />
             </TouchableOpacity>
 
             <Modal
@@ -65,10 +66,11 @@ const CountryCode = () => {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.searchBar}>
-                        <Feather name="search" size={20} color="#000" />
+                        <Feather name="search" size={20} color="#6a6a6a" />
                         <TextInput
                             style={styles.searchInput}
                             placeholder="Tìm kiếm quốc gia..."
+                            placeholderTextColor="#6a6a6a"
                             value={searchText}
                             onChangeText={setSearchText}
                         />
@@ -92,24 +94,25 @@ const CountryCode = () => {
 
 const styles = StyleSheet.create({
     container: {
-        marginVertical: 10,
+        marginVertical: 8,
     },
     selectedCountry: {
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 10,
-        marginHorizontal: 10,
+        borderColor: '#a9a9a9',
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 50,
     },
     flag: {
         fontSize: 20,
-        marginRight: 10,
+        marginRight: 8,
     },
     countryCode: {
         fontSize: 16,
-        marginRight: 10,
+        color: '#000',
+        marginRight: 4,
     },
     modalContainer: {
         flex: 1,
@@ -123,37 +126,42 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
+        borderColor: '#a9a9a9',
+        borderRadius: 10,
         marginBottom: 10,
         paddingHorizontal: 10,
-        paddingVertical: 5,
+        height: 50,
     },
     searchInput: {
         flex: 1,
         marginLeft: 10,
+        fontSize: 16,
+        color: '#000',
     },
     countryItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
+        paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
+        borderBottomColor: '#e0e0e0',
     },
     countryName: {
         flex: 1,
         fontSize: 16,
+        color: '#000',
+        marginLeft: 10,
     },
     closeButton: {
         alignItems: 'center',
         padding: 15,
         backgroundColor: '#e77105',
-        borderRadius: 5,
+        borderRadius: 10,
         marginTop: 10,
     },
     closeButtonText: {
         color: '#fff',
         fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
