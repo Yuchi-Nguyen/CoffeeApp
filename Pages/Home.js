@@ -30,10 +30,13 @@ const Home = () => {
 
         // Fetch categories
         const categoriesSnapshot = await getDocs(collection(db, 'categories'));
-        const categoriesData = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const categoriesData = categoriesSnapshot.docs.map(doc => {
+          console.log('Category data:', doc.data());
+          return {
+            id: doc.id,
+            ...doc.data()
+          };
+        });
         const sortedCategories = categoriesData.sort((a, b) => {
           const idA = parseInt(a.id);
           const idB = parseInt(b.id);
@@ -87,7 +90,7 @@ const Home = () => {
       style={styles.categoryItem}
       onPress={() => navigation.navigate('Order', { selectedCategoryId: item.id })}
     >
-      <Image source={{ uri: item.image }} style={styles.categoryImage} />
+      <Image source={{ uri: item.icon }} style={styles.categoryImage} />
       <Text style={styles.categoryName}>{item.name[currentLanguage]}</Text>
     </TouchableOpacity>
   );
