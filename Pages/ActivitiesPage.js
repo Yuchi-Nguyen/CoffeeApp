@@ -1,26 +1,78 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { firebaseService } from '../services/firebaseService';
+import { LanguageContext } from '../context/LanguageContext';
+
+const translations = {
+  vi: {
+    pageTitle: 'Đơn hàng của bạn',
+    orderId: 'Mã đơn:',
+    total: 'Tổng tiền:',
+    cancelOrder: 'Hủy đơn',
+    payNow: 'Thanh toán',
+    orderCancelled: 'Đơn hàng đã bị hủy',
+    orderPaid: 'Đã thanh toán',
+    confirmCancel: 'Xác nhận hủy đơn',
+    confirmCancelMsg: 'Bạn có chắc chắn muốn hủy đơn hàng này?',
+    confirmPayment: 'Xác nhận thanh toán',
+    confirmPaymentMsg: 'Bạn có chắc chắn muốn thanh toán đơn hàng này?',
+    no: 'Không',
+    yes: 'Có',
+    cancel: 'Hủy',
+    error: 'Lỗi',
+    loadError: 'Không thể tải danh sách đơn hàng',
+    cancelError: 'Không thể hủy đơn hàng',
+    updateError: 'Không thể cập nhật trạng thái đơn hàng',
+    currency: 'đ',
+    orderCode: 'Mã đơn:',
+    totalAmount: 'Tổng tiền:',
+    items: 'x',
+  },
+  en: {
+    pageTitle: 'Your Orders',
+    orderId: 'Order ID:',
+    total: 'Total:',
+    cancelOrder: 'Cancel Order',
+    payNow: 'Pay Now',
+    orderCancelled: 'Order Cancelled',
+    orderPaid: 'Paid',
+    confirmCancel: 'Confirm Cancellation',
+    confirmCancelMsg: 'Are you sure you want to cancel this order?',
+    confirmPayment: 'Confirm Payment',
+    confirmPaymentMsg: 'Are you sure you want to pay for this order?',
+    no: 'No',
+    yes: 'Yes',
+    cancel: 'Cancel',
+    error: 'Error',
+    loadError: 'Cannot load orders list',
+    cancelError: 'Cannot cancel order',
+    updateError: 'Cannot update order status',
+    currency: '$',
+    orderCode: 'Order Code:',
+    totalAmount: 'Total Amount:',
+    items: 'x',
+  }
+};
 
 const ActivitiesPage = () => {
   const { user } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
   const [timeLeft, setTimeLeft] = useState({});
+  const { currentLanguage } = useContext(LanguageContext);
+  const t = translations[currentLanguage];
 
-  // Thêm lại hàm getStatusColor
   const getStatusColor = (status) => {
     switch (status) {
       case 'paid':
-        return '#28a745';  // màu xanh lá cho trạng thái đã thanh toán
+        return '#28a745'; 
       case 'unpaid':
-        return '#ffc107';  // màu vàng cho trạng thái chưa thanh toán
+        return '#ffc107'; 
       case 'failed':
-        return '#dc3545';  // màu đỏ cho trạng thái đã hủy
+        return '#dc3545'; 
       default:
-        return '#666';     // màu mặc định
+        return '#666';     
     }
   };
 
@@ -50,29 +102,29 @@ const ActivitiesPage = () => {
       }
     } catch (error) {
       console.error('Error loading orders:', error);
-      Alert.alert('Lỗi', 'Không thể tải danh sách đơn hàng');
+      Alert.alert(t.error, t.loadError);
     }
   };
 
   // Handle payment
   const handlePayment = async (orderId) => {
     Alert.alert(
-      "Xác nhận thanh toán",
-      "Bạn có chắc chắn muốn thanh toán đơn hàng này?",
+      t.confirmPayment,
+      t.confirmPaymentMsg,
       [
         {
-          text: "Hủy",
+          text: t.cancel,
           style: "cancel"
         },
         {
-          text: "Đồng ý",
+          text: t.yes,
           onPress: async () => {
             try {
               await firebaseService.updateOrderStatus(orderId, 'paid');
               await loadOrders();
             } catch (error) {
               console.error('Error updating order:', error);
-              Alert.alert('Lỗi', 'Không thể cập nhật trạng thái đơn hàng');
+              Alert.alert(t.error, t.updateError);
             }
           }
         }
@@ -83,22 +135,22 @@ const ActivitiesPage = () => {
   // Handle cancel
   const handleCancel = async (orderId) => {
     Alert.alert(
-      "Xác nhận hủy đơn",
-      "Bạn có chắc chắn muốn hủy đơn hàng này?",
+      t.confirmCancel,
+      t.confirmCancelMsg,
       [
         {
-          text: "Không",
+          text: t.no,
           style: "cancel"
         },
         {
-          text: "Có",
+          text: t.yes,
           onPress: async () => {
             try {
               await firebaseService.updateOrderStatus(orderId, 'failed');
               await loadOrders();
             } catch (error) {
               console.error('Error canceling order:', error);
-              Alert.alert('Lỗi', 'Không thể hủy đơn hàng');
+              Alert.alert(t.error, t.cancelError);
             }
           }
         }
@@ -133,7 +185,7 @@ const ActivitiesPage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Hàm format thời gian
+  // format thời gian
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -144,8 +196,8 @@ const ActivitiesPage = () => {
     <View style={styles.orderCard} key={order.id}>
       {/* Header của đơn hàng */}
       <View style={styles.orderHeader}>
-        <View>
-          <Text style={styles.orderId}>Mã đơn: {order.id}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.orderId}>{t.orderCode} {order.id}</Text>
           <Text style={styles.serviceType}>
             <Feather 
               name={order.serviceType === 'Dine-in' ? 'coffee' : 'shopping-bag'} 
@@ -153,7 +205,7 @@ const ActivitiesPage = () => {
             /> {order.serviceType}
           </Text>
         </View>
-        <View>
+        <View style={styles.statusContainer}>
           {order.status === 'unpaid' && timeLeft[order.id] > 0 && (
             <Text style={styles.timerText}>
               <Feather name="clock" size={14} /> {formatTime(timeLeft[order.id])}
@@ -192,15 +244,14 @@ const ActivitiesPage = () => {
         </Text>
         {order.items.map((item, index) => (
           <Text key={index} style={styles.itemText}>
-            {item.quantity}x {item.name}
+            {item.quantity}{t.items} {item.name}
           </Text>
         ))}
         <Text style={styles.totalText}>
-          Tổng tiền: {order.total.toLocaleString()}đ
+          {t.totalAmount} {order.total.toLocaleString()}{t.currency}
         </Text>
       </View>
 
-      {/* Cập nhật phần buttons */}
       <View style={styles.buttonContainer}>
         {order.status === 'unpaid' && (
           <>
@@ -208,24 +259,24 @@ const ActivitiesPage = () => {
               style={[styles.button, styles.cancelButton]}
               onPress={() => handleCancel(order.id)}
             >
-              <Text style={styles.cancelButtonText}>Hủy đơn</Text>
+              <Text style={styles.cancelButtonText}>{t.cancelOrder}</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.button, styles.payButton]}
               onPress={() => handlePayment(order.id)}
             >
-              <Text style={styles.payButtonText}>Thanh toán</Text>
+              <Text style={styles.payButtonText}>{t.payNow}</Text>
             </TouchableOpacity>
           </>
         )}
         {order.status === 'failed' && (
           <View style={styles.failedMessage}>
-            <Text style={styles.failedText}>Đơn hàng đã bị hủy</Text>
+            <Text style={styles.failedText}>{t.orderCancelled}</Text>
           </View>
         )}
         {order.status === 'paid' && (
           <View style={styles.paidMessage}>
-            <Text style={styles.paidText}>Đã thanh toán</Text>
+            <Text style={styles.paidText}>{t.orderPaid}</Text>
           </View>
         )}
       </View>
@@ -234,7 +285,7 @@ const ActivitiesPage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.pageTitle}>Đơn hàng của bạn</Text>
+      <Text style={styles.pageTitle}>{t.pageTitle}</Text>
       <ScrollView style={styles.scrollView}>
         {orders.map(order => renderOrderCard(order))}
       </ScrollView>
@@ -275,26 +326,36 @@ const styles = StyleSheet.create({
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 12,
   },
   orderId: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 4,
+    flex: 1,
+    paddingRight: 8,
   },
   serviceType: {
     fontSize: 14,
     color: '#666',
   },
+  statusContainer: {
+    flexShrink: 0,
+    width: 80,
+    alignItems: 'flex-end',
+  },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    minWidth: 60,
+    alignItems: 'center',
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   orderDetails: {
     borderTopWidth: 1,
@@ -366,7 +427,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   timerText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#dc3545',
     fontWeight: 'bold',
     marginBottom: 4,

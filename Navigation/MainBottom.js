@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from '../Pages/Home';
@@ -10,6 +10,7 @@ import ProductDetails from '../Pages/ProductDetails';
 import CartScreen from '../Pages/Cart';
 import Feather from 'react-native-vector-icons/Feather';
 import { View } from 'react-native';
+import { LanguageContext } from '../context/LanguageContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -37,6 +38,25 @@ function OrderStack() {
 }
 
 export default function MainBottom() {
+  const { currentLanguage } = useContext(LanguageContext);
+
+  const tabNames = {
+    vi: {
+      home: 'Trang chủ',
+      order: 'Đặt hàng',
+      activities: 'Hoạt động',
+      stores: 'Cửa hàng',
+      others: 'Khác'
+    },
+    en: {
+      home: 'Home',
+      order: 'Order',
+      activities: 'Activities',
+      stores: 'Stores',
+      others: 'Others'
+    }
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -67,11 +87,31 @@ export default function MainBottom() {
           borderTopWidth: 0,
         },
       })}>
-      <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Order" component={OrderStack} />
-      <Tab.Screen name="Activities" component={ActivitiesPage} />
-      <Tab.Screen name="Stores" component={StoresPage} />
-      <Tab.Screen name="Others" component={OthersPage} />
+      <Tab.Screen 
+        name="Home" 
+        component={HomeStack}
+        options={{ tabBarLabel: tabNames[currentLanguage].home }}
+      />
+      <Tab.Screen 
+        name="Order" 
+        component={OrderStack}
+        options={{ tabBarLabel: tabNames[currentLanguage].order }}
+      />
+      <Tab.Screen 
+        name="Activities" 
+        component={ActivitiesPage}
+        options={{ tabBarLabel: tabNames[currentLanguage].activities }}
+      />
+      <Tab.Screen 
+        name="Stores" 
+        component={StoresPage}
+        options={{ tabBarLabel: tabNames[currentLanguage].stores }}
+      />
+      <Tab.Screen 
+        name="Others" 
+        component={OthersPage}
+        options={{ tabBarLabel: tabNames[currentLanguage].others }}
+      />
     </Tab.Navigator>
   );
 }

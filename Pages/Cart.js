@@ -18,11 +18,101 @@ import { AuthContext } from '../context/AuthContext';
 import { firebaseService } from '../services/firebaseService';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { LanguageContext } from '../context/LanguageContext';
 
+const translations = {
+  vi: {
+    title: 'Giỏ hàng',
+    orderType: 'Hình thức đặt hàng',
+    locationTime: 'Địa điểm & Thời gian',
+    selectTime: 'Chọn thời gian',
+    yourCart: 'Giỏ hàng của bạn',
+    size: 'Size',
+    discount: 'Mã giảm giá',
+    applyDiscount: 'Áp dụng',
+    total: 'Tổng cộng:',
+    placeOrder: 'Đặt hàng',
+    confirmOrder: 'Xác nhận đặt hàng',
+    payNow: 'Thanh toán ngay',
+    payLater: 'Thanh toán sau',
+    cancel: 'Hủy',
+    success: 'Thành công',
+    orderCreated: 'Đơn hàng của bạn đã được tạo',
+    orderPaid: 'Đơn hàng đã được thanh toán',
+    error: 'Lỗi',
+    orderError: 'Không thể đặt hàng. Vui lòng thử lại sau.',
+    selectOrderType: 'Vui lòng chọn hình thức đặt hàng',
+    selectStore: 'Vui lòng chọn cửa hàng trong mục Stores',
+    dineIn: 'Dine-in',
+    pickUp: 'Pick-up',
+    pleaseSelectOrderType: 'Vui lòng chọn hình thức đặt hàng',
+    orderTypeTitle: 'Hình thức đặt hàng',
+    locationAndTime: 'Địa điểm & Thời gian',
+    location: 'Địa điểm',
+    time: 'Thời gian',
+    selectStore: 'Chọn cửa hàng',
+    quantity: 'Số lượng',
+    specialInstructions: 'Ghi chú đặc biệt',
+    loadCartError: 'Không thể tải giỏ hàng. Vui lòng thử lại sau.',
+    updateQuantityError: 'Không thể cập nhật số lượng. Vui lòng thử lại sau.',
+    removeItemError: 'Không thể xóa sản phẩm. Vui lòng thử lại sau.',
+    discountApplied: 'Đã áp dụng giảm giá',
+    discountSaved: 'Bạn đã tiết kiệm được',
+    invalidCode: 'Mã không hợp lệ',
+    invalidCodeMessage: 'Vui lòng nhập mã giảm giá hợp lệ.',
+    discountPlaceholder: 'Nhập mã giảm giá',
+    applyButton: 'Áp dụng',
+  },
+  en: {
+    title: 'Cart',
+    orderType: 'Order Type',
+    locationTime: 'Location & Time',
+    selectTime: 'Select Time',
+    yourCart: 'Your Cart',
+    size: 'Size',
+    discount: 'Discount Code',
+    applyDiscount: 'Apply',
+    total: 'Total:',
+    placeOrder: 'Place Order',
+    confirmOrder: 'Confirm Order',
+    payNow: 'Pay Now',
+    payLater: 'Pay Later',
+    cancel: 'Cancel',
+    success: 'Success',
+    orderCreated: 'Your order has been created',
+    orderPaid: 'Order has been paid',
+    error: 'Error',
+    orderError: 'Cannot place order. Please try again.',
+    selectOrderType: 'Please select an order type',
+    selectStore: 'Please select a store in Stores section',
+    dineIn: 'Dine-in',
+    pickUp: 'Pick-up',
+    pleaseSelectOrderType: 'Please select an order type',
+    orderTypeTitle: 'Order Type',
+    locationAndTime: 'Location & Time',
+    location: 'Location',
+    time: 'Time',
+    selectStore: 'Select Store',
+    quantity: 'Quantity',
+    specialInstructions: 'Special Instructions',
+    loadCartError: 'Cannot load cart. Please try again later.',
+    updateQuantityError: 'Cannot update quantity. Please try again later.',
+    removeItemError: 'Cannot remove item. Please try again later.',
+    discountApplied: 'Discount Applied',
+    discountSaved: 'You saved',
+    invalidCode: 'Invalid Code',
+    invalidCodeMessage: 'Please enter a valid discount code.',
+    discountPlaceholder: 'Enter discount code',
+    applyButton: 'Apply',
+  }
+};
 
 const CartScreen = () => {
   const { user } = useContext(AuthContext);
   const navigation = useNavigation();
+  const { currentLanguage } = useContext(LanguageContext);
+  const t = translations[currentLanguage];
+
   const Header = () => (
     <View style={styles.headerContainer}>
       <TouchableOpacity
@@ -31,7 +121,7 @@ const CartScreen = () => {
       >
         <Feather name="arrow-left" size={24} color="#000" />
       </TouchableOpacity>
-      <Text style={styles.headerTitle}>Giỏ hàng</Text>
+      <Text style={styles.headerTitle}>{t.title}</Text>
     </View>
   );
 
@@ -54,7 +144,7 @@ const CartScreen = () => {
     setTime(formattedTime);
   }, []);
 
-  // Xử lý khi thời gian được chọn
+  // Xử lý khi thời gian đưc chọn
   const handleTimeSelect = (event, selected) => {
     setShowTimePicker(false);
     if (selected) {
@@ -85,7 +175,7 @@ const CartScreen = () => {
       }
     } catch (error) {
       console.error('Error loading cart items:', error);
-      Alert.alert('Lỗi', 'Không thể tải giỏ hàng. Vui lòng thử lại sau.');
+      Alert.alert(t.error, t.loadCartError);
     }
   };
 
@@ -99,7 +189,7 @@ const CartScreen = () => {
     return total - discount;
   };
 
-  // Cập nhật số lượng s���n phẩm
+  // Cập nhật số lượng sản phẩm
   const updateQuantity = async (id, change) => {
     try {
       const item = cartItems.find(item => item.id === id);
@@ -114,7 +204,7 @@ const CartScreen = () => {
       await loadCartItems(); // Reload cart items
     } catch (error) {
       console.error('Error updating quantity:', error);
-      Alert.alert('Lỗi', 'Không thể cập nhật số lượng. Vui lòng thử lại sau.');
+      Alert.alert(t.error, t.updateQuantityError);
     }
   };
 
@@ -125,7 +215,7 @@ const CartScreen = () => {
       await loadCartItems(); // Reload cart items
     } catch (error) {
       console.error('Error removing item:', error);
-      Alert.alert('Lỗi', 'Không thể xóa sản phẩm. Vui lòng thử lại sau.');
+      Alert.alert(t.error, t.removeItemError);
     }
   };
 
@@ -133,15 +223,14 @@ const CartScreen = () => {
   const applyDiscountCode = () => {
     if (discountCode === 'SAVE10') {
       setDiscount(10);
-      Alert.alert('Discount Applied', 'You saved $10!');
+      Alert.alert(t.discountApplied, `${t.discountSaved} $10!`);
     } else {
-      Alert.alert('Invalid Code', 'Please enter a valid discount code.');
+      Alert.alert(t.invalidCode, t.invalidCodeMessage);
     }
   };
 
   const [selectedStore, setSelectedStore] = useState(null);
 
-  // Thêm useEffect để lấy thông tin cửa hàng đã chọn
   useEffect(() => {
     const getSelectedStore = async () => {
       try {
@@ -166,82 +255,73 @@ const CartScreen = () => {
   const handlePlaceOrder = async () => {
     try {
       if (!orderType) {
-        Alert.alert('Thông báo', 'Vui lòng chọn hình thức đặt hàng');
+        Alert.alert(t.error, t.selectOrderType);
         return;
       }
 
       if (!selectedStore) {
-        Alert.alert('Thông báo', 'Vui lòng chọn cửa hàng trong mục Stores');
+        Alert.alert(t.error, t.selectStore);
         return;
       }
 
       Alert.alert(
-        "Xác nhận đặt hàng",
-        "Bạn có muốn thanh toán ngay không?",
+        t.confirmOrder,
+        "",
         [
-          {
-            text: "Hủy",
-            style: "cancel"
-          },
-          {
-            text: "Thanh toán sau",
-            onPress: async () => {
-              const orderData = {
-                serviceType: orderType,
-                items: cartItems,
-                location: selectedStore.address,
-                store: {
-                  id: selectedStore.id,
-                  name: selectedStore.name,
-                  address: selectedStore.address,
-                  phone: selectedStore.phone,
-                  image: selectedStore.image
-                },
-                total: calculateTotal(),
-                time: time,
-                status: 'unpaid'
-              };
-              await firebaseService.createOrder(user.uid, orderData);
-              await firebaseService.clearCart(user.uid);
-              Alert.alert('Thành công', 'Đơn hàng của bạn đã được tạo');
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Activities' }],
-              });
-            }
-          },
-          {
-            text: "Thanh toán ngay",
-            onPress: async () => {
-              const orderData = {
-                serviceType: orderType,
-                items: cartItems,
-                location: selectedStore.address,
-                store: {
-                  id: selectedStore.id,
-                  name: selectedStore.name,
-                  address: selectedStore.address,
-                  phone: selectedStore.phone,
-                  image: selectedStore.image
-                },
-                total: calculateTotal(),
-                time: time,
-                status: 'paid'
-              };
-              await firebaseService.createOrder(user.uid, orderData);
-              await firebaseService.clearCart(user.uid);
-              Alert.alert('Thành công', 'Đơn hàng đã được thanh toán');
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Activities' }],
-              });
-            }
-          }
+          { text: t.cancel, style: "cancel" },
+          { text: t.payLater, onPress: async () => {
+            const orderData = {
+              serviceType: orderType,
+              items: cartItems,
+              location: selectedStore.address,
+              store: {
+                id: selectedStore.id,
+                name: selectedStore.name,
+                address: selectedStore.address,
+                phone: selectedStore.phone,
+                image: selectedStore.image
+              },
+              total: calculateTotal(),
+              time: time,
+              status: 'unpaid'
+            };
+            await firebaseService.createOrder(user.uid, orderData);
+            await firebaseService.clearCart(user.uid);
+            Alert.alert(t.success, t.orderCreated);
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Activities' }],
+            });
+          }},
+          { text: t.payNow, onPress: async () => {
+            const orderData = {
+              serviceType: orderType,
+              items: cartItems,
+              location: selectedStore.address,
+              store: {
+                id: selectedStore.id,
+                name: selectedStore.name,
+                address: selectedStore.address,
+                phone: selectedStore.phone,
+                image: selectedStore.image
+              },
+              total: calculateTotal(),
+              time: time,
+              status: 'paid'
+            };
+            await firebaseService.createOrder(user.uid, orderData);
+            await firebaseService.clearCart(user.uid);
+            Alert.alert(t.success, t.orderPaid);
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Activities' }],
+            });
+          }}
         ]
       );
     } catch (error) {
       console.error('Error placing order:', error);
-      Alert.alert('Lỗi', 'Không thể đặt hàng. Vui lòng thử lại sau.');
+      Alert.alert(t.error, t.orderError);
     }
   };
 
@@ -252,7 +332,7 @@ const CartScreen = () => {
       <ScrollView style={styles.scrollContent}>
         {/* Order Type Selection */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hình thức đặt hàng</Text>
+          <Text style={styles.sectionTitle}>{t.orderTypeTitle}</Text>
           <View style={styles.orderTypeContainer}>
             <TouchableOpacity
               style={[
@@ -269,7 +349,7 @@ const CartScreen = () => {
               <Text style={[
                 styles.buttonText,
                 orderType === 'Dine-in' && styles.selectedButtonText
-              ]}>Dine-in</Text>
+              ]}>{t.dineIn}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -286,17 +366,17 @@ const CartScreen = () => {
               <Text style={[
                 styles.buttonText,
                 orderType === 'Pick-up' && styles.selectedButtonText
-              ]}>Pick-up</Text>
+              ]}>{t.pickUp}</Text>
             </TouchableOpacity>
           </View>
           {orderType === null && 
-            <Text style={styles.errorText}>Vui lòng chọn hình thức đặt hàng</Text>
+            <Text style={styles.errorText}>{t.pleaseSelectOrderType}</Text>
           }
         </View>
 
         {/* Location & Time Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Địa điểm & Thời gian</Text>
+          <Text style={styles.sectionTitle}>{t.locationAndTime}</Text>
           <View style={styles.locationContainer}>
             <Feather name="map-pin" size={20} color="#666" />
             <Text style={styles.locationText}>
@@ -311,7 +391,7 @@ const CartScreen = () => {
             <View style={styles.timeSelectorContent}>
               <Feather name="clock" size={20} color="#666" />
               <Text style={styles.timeText}>
-                Thời gian: {time || 'Chọn thời gian'}
+                {t.time}: {time || t.selectTime}
               </Text>
             </View>
             <Feather name="chevron-right" size={20} color="#666" />
@@ -330,7 +410,7 @@ const CartScreen = () => {
 
         {/* Cart Items */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Giỏ hàng của bạn</Text>
+          <Text style={styles.sectionTitle}>{t.yourCart}</Text>
           {cartItems.map((item) => (
             <View key={item.id} style={styles.cartItem}>
               <View style={styles.itemInfo}>
@@ -368,7 +448,7 @@ const CartScreen = () => {
           <View style={styles.discountContainer}>
             <TextInput
               style={styles.discountInput}
-              placeholder="Nhập mã giảm giá"
+              placeholder={t.discountPlaceholder}
               value={discountCode}
               onChangeText={setDiscountCode}
             />
@@ -376,7 +456,7 @@ const CartScreen = () => {
               style={styles.applyButton}
               onPress={applyDiscountCode}
             >
-              <Text style={styles.applyButtonText}>Áp dụng</Text>
+              <Text style={styles.applyButtonText}>{t.applyButton}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -385,14 +465,14 @@ const CartScreen = () => {
       {/* Footer - Outside ScrollView */}
       <View style={styles.footer}>
         <View style={styles.totalContainer}>
-          <Text style={styles.totalLabel}>Tổng cộng:</Text>
+          <Text style={styles.totalLabel}>{t.total}</Text>
           <Text style={styles.totalAmount}>${calculateTotal()}</Text>
         </View>
         <TouchableOpacity 
           style={styles.placeOrderButton}
           onPress={handlePlaceOrder}
         >
-          <Text style={styles.placeOrderText}>Đặt hàng</Text>
+          <Text style={styles.placeOrderText}>{t.placeOrder}</Text>
           <Feather name="arrow-right" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -576,7 +656,6 @@ const styles = StyleSheet.create({
     padding: 15,
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    // Thêm shadow cho footer
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -616,7 +695,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   discountSection: {
-    marginBottom: 20, // Thêm margin bottom cho section cuối cùng
+    marginBottom: 20, 
   },
 });
 
