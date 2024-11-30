@@ -8,9 +8,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { LanguageContext } from '../context/LanguageContext';
 
 const OthersPage = () => {
   const { user, logout } = useContext(AuthContext);
+  const { currentLanguage } = useContext(LanguageContext);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [isEditable, setIsEditable] = useState(false);
@@ -32,6 +34,49 @@ const OthersPage = () => {
     drips: 0,
     prepaid: 0
   });
+
+  const translations = {
+    vi: {
+      account: 'Tài khoản',
+      profile: 'Hồ sơ',
+      settings: 'Cài đặt',
+      generalInfo: 'Thông tin chung',
+      policies: 'Chính sách',
+      loyaltyProgram: 'Chương trình thành viên',
+      aboutApp: 'Về ứng dụng',
+      version: 'Phiên bản',
+      helpCenter: 'Trung tâm trợ giúp',
+      faqs: 'Câu hỏi thường gặp',
+      feedbackSupport: 'Phản hồi & Hỗ trợ',
+      logout: 'Đăng xuất',
+      logoutConfirm: 'Đăng xuất',
+      logoutMessage: 'Bạn có chắc chắn muốn đăng xuất?',
+      cancel: 'Hủy',
+      error: 'Lỗi',
+      logoutError: 'Không thể đăng xuất. Vui lòng thử lại.'
+    },
+    en: {
+      account: 'Account',
+      profile: 'Profile',
+      settings: 'Settings',
+      generalInfo: 'General Information',
+      policies: 'Policies',
+      loyaltyProgram: 'Loyalty Program',
+      aboutApp: 'About App',
+      version: 'Version',
+      helpCenter: 'Help Center',
+      faqs: 'FAQs',
+      feedbackSupport: 'Feedback & Support',
+      logout: 'Logout',
+      logoutConfirm: 'Logout',
+      logoutMessage: 'Are you sure you want to logout?',
+      cancel: 'Cancel',
+      error: 'Error',
+      logoutError: 'Cannot logout. Please try again.'
+    }
+  };
+
+  const t = translations[currentLanguage];
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -92,21 +137,21 @@ const OthersPage = () => {
 
   const handleLogout = () => {
     Alert.alert(
-      "Đăng xuất",
-      "Bạn có chắc chắn muốn đăng xuất?",
+      t.logoutConfirm,
+      t.logoutMessage,
       [
         {
-          text: "Hủy",
+          text: t.cancel,
           style: "cancel"
         },
         {
-          text: "Đăng xuất",
+          text: t.logout,
           onPress: async () => {
             try {
               await logout();
             } catch (error) {
               console.error('Logout error:', error);
-              Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+              Alert.alert(t.error, t.logoutError);
             }
           },
           style: 'destructive'
@@ -126,7 +171,7 @@ const OthersPage = () => {
       <View style={styles.container}>
         <ScrollView style={styles.content}>
           {/* Account Group */}
-          <Text style={styles.groupTitle}>Account</Text>
+          <Text style={styles.groupTitle}>{t.account}</Text>
           <View style={styles.group}>
             <TouchableOpacity 
               style={styles.menuItemWithBorder}
@@ -134,62 +179,62 @@ const OthersPage = () => {
             >
               <View style={styles.menuLeft}>
                 <Feather name="user" size={20} color="#666" style={styles.menuIcon} />
-                <Text style={styles.menuText}>Profile</Text>
+                <Text style={styles.menuText}>{t.profile}</Text>
               </View>
               <Feather name="chevron-right" size={20} color="#666" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuLeft}>
                 <Feather name="settings" size={20} color="#666" style={styles.menuIcon} />
-                <Text style={styles.menuText}>Setting</Text>
+                <Text style={styles.menuText}>{t.settings}</Text>
               </View>
               <Feather name="chevron-right" size={20} color="#666" />
             </TouchableOpacity>
           </View>
   
           {/* General Information Group */}
-          <Text style={styles.groupTitle}>General Information</Text>
+          <Text style={styles.groupTitle}>{t.generalInfo}</Text>
           <View style={styles.group}>
             <TouchableOpacity style={styles.menuItemWithBorder}>
               <View style={styles.menuLeft}>
                 <Feather name="file-text" size={20} color="#666" style={styles.menuIcon} />
-                <Text style={styles.menuText}>Policies</Text>
+                <Text style={styles.menuText}>{t.policies}</Text>
               </View>
               <Feather name="chevron-right" size={20} color="#666" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuItemWithBorder}>
               <View style={styles.menuLeft}>
                 <Feather name="award" size={20} color="#666" style={styles.menuIcon} />
-                <Text style={styles.menuText}>Loyalty Program</Text>
+                <Text style={styles.menuText}>{t.loyaltyProgram}</Text>
               </View>
               <Feather name="chevron-right" size={20} color="#666" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuLeft}>
                 <Feather name="info" size={20} color="#666" style={styles.menuIcon} />
-                <Text style={styles.menuText}>About App</Text>
+                <Text style={styles.menuText}>{t.aboutApp}</Text>
               </View>
               <View style={styles.versionContainer}>
-                <Text style={styles.versionLabel}>Version</Text>
+                <Text style={styles.versionLabel}>{t.version}</Text>
                 <Text style={styles.versionText}>1.0.0</Text>
               </View>
             </TouchableOpacity>
           </View>
   
           {/* Help Center Group */}
-          <Text style={styles.groupTitle}>Help Center</Text>
+          <Text style={styles.groupTitle}>{t.helpCenter}</Text>
           <View style={styles.group}>
             <TouchableOpacity style={styles.menuItemWithBorder}>
               <View style={styles.menuLeft}>
                 <Feather name="help-circle" size={20} color="#666" style={styles.menuIcon} />
-                <Text style={styles.menuText}>FAQs</Text>
+                <Text style={styles.menuText}>{t.faqs}</Text>
               </View>
               <Feather name="chevron-right" size={20} color="#666" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuLeft}>
                 <Feather name="message-circle" size={20} color="#666" style={styles.menuIcon} />
-                <Text style={styles.menuText}>Feedback & Support</Text>
+                <Text style={styles.menuText}>{t.feedbackSupport}</Text>
               </View>
               <Feather name="chevron-right" size={20} color="#666" />
             </TouchableOpacity>
@@ -201,7 +246,7 @@ const OthersPage = () => {
               style={styles.logoutButton}
               onPress={handleLogout}
             >
-              <Text style={styles.logoutText}>Đăng xuất</Text>
+              <Text style={styles.logoutText}>{t.logout}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

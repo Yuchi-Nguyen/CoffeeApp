@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Swiper from 'react-native-swiper';
@@ -6,6 +6,7 @@ import Header from '../Components/Header';
 import { useNavigation } from '@react-navigation/native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { LanguageContext } from '../context/LanguageContext';
 
 const Home = () => {
   const navigation = useNavigation();
@@ -14,6 +15,26 @@ const Home = () => {
   const [promotions, setPromotions] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { currentLanguage } = useContext(LanguageContext);
+
+  const translations = {
+    vi: {
+      categories: 'Danh mục sản phẩm',
+      currentPromotions: 'Ưu đãi hiện tại',
+      bestSellers: 'Sản phẩm bán chạy',
+      searchPlaceholder: 'Tìm kiếm sản phẩm...',
+      currency: 'đ'
+    },
+    en: {
+      categories: 'Categories',
+      currentPromotions: 'Current Promotions',
+      bestSellers: 'Best Sellers',
+      searchPlaceholder: 'Search products...',
+      currency: 'VND'
+    }
+  };
+
+  const t = translations[currentLanguage];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,10 +49,13 @@ const Home = () => {
 
         // Fetch categories
         const categoriesSnapshot = await getDocs(collection(db, 'categories'));
-        const categoriesData = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const categoriesData = categoriesSnapshot.docs.map(doc => {
+          console.log('Category data:', doc.data());
+          return {
+            id: doc.id,
+            ...doc.data()
+          };
+        });
         const sortedCategories = categoriesData.sort((a, b) => {
           const idA = parseInt(a.id);
           const idB = parseInt(b.id);
@@ -68,7 +92,10 @@ const Home = () => {
   const handleCategoryPress = (categoryId) => {
     navigation.navigate('Order', {
       screen: 'OrderScreen',
-      params: { selectedCategoryId: categoryId }
+      params: { 
+        selectedCategoryId: categoryId,
+        language: currentLanguage
+      }
     });
   };
 
@@ -77,8 +104,18 @@ const Home = () => {
   };
 
   const formatCurrency = (amount) => {
-    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫";
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " " + t.currency;
   };
+
+  const renderCategory = ({ item }) => (
+    <TouchableOpacity
+      style={styles.categoryItem}
+      onPress={() => handleCategoryPress(item.id)}
+    >
+      <Image source={{ uri: item.icon }} style={styles.categoryImage} />
+      <Text style={styles.categoryName}>{item.name[currentLanguage]}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -98,26 +135,18 @@ const Home = () => {
 
         {/* Danh mục sản phẩm */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Danh mục sản phẩm</Text>
+          <Text style={styles.sectionTitle}>{t.categories}</Text>
           <FlatList
             data={categories}
             horizontal
-            renderItem={({ item }) => (
-              <TouchableOpacity 
-                style={styles.categoryItem}
-                onPress={() => handleCategoryPress(item.id)}
-              >
-                <Image source={{ uri: item.icon }} style={styles.categoryIcon} />
-                <Text style={styles.categoryText}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
+            renderItem={renderCategory}
             keyExtractor={(item) => item.id.toString()}
           />
         </View>
 
         {/* Ưu đãi hiện tại */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ưu đãi hiện tại</Text>
+          <Text style={styles.sectionTitle}>{t.currentPromotions}</Text>
           <FlatList
             data={promotions}
             horizontal
@@ -135,7 +164,7 @@ const Home = () => {
 
         {/* Sản phẩm bán chạy */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sản phẩm bán chạy</Text>
+          <Text style={styles.sectionTitle}>{t.bestSellers}</Text>
           <FlatList
             data={bestSellers}
             horizontal
@@ -182,13 +211,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
-  categoryIcon: {
+  categoryImage: {
     width: 60,
     height: 60,
     borderRadius: 30,
     marginBottom: 8,
   },
-  categoryText: {
+  categoryName: {
     fontSize: 14,
     textAlign: 'center',
   },

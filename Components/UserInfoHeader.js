@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
     View,
     Text,
@@ -11,17 +11,21 @@ import {
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
+import { LanguageContext } from '../context/LanguageContext';
 
 const Header = ({ userName, memberLevel, drips, prepaid }) => {
+    const { changeLanguage } = useContext(LanguageContext);
     const [languageModalVisible, setLanguageModalVisible] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState({
         name: 'Tiếng Việt',
         flag: require('../assets/vn-flag.png'),
+        code: 'vi'
     });
     const [avatar, setAvatar] = useState(null);
 
     const handleSelectLanguage = (language) => {
         setSelectedLanguage(language);
+        changeLanguage(language.code);
         setLanguageModalVisible(false);
     };
 
@@ -101,6 +105,7 @@ const Header = ({ userName, memberLevel, drips, prepaid }) => {
                             handleSelectLanguage({
                                 name: 'Tiếng Việt',
                                 flag: require('../assets/vn-flag.png'),
+                                code: 'vi'
                             })
                         }
                     >
@@ -116,6 +121,7 @@ const Header = ({ userName, memberLevel, drips, prepaid }) => {
                             handleSelectLanguage({
                                 name: 'English',
                                 flag: require('../assets/uk-flag.png'),
+                                code: 'en'
                             })
                         }
                     >

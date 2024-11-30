@@ -11,9 +11,11 @@ import { db } from '../config/firebase';
 import * as FileSystem from 'expo-file-system';
 import { updateProfile } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { LanguageContext } from '../context/LanguageContext';
 
 const ProfileEdit = () => {
   const { user } = useContext(AuthContext);
+  const { currentLanguage } = useContext(LanguageContext);
   const [isEditable, setIsEditable] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -95,7 +97,6 @@ const ProfileEdit = () => {
     setDisableDatePicker(!isEditable);
   }, [isEditable]);
 
-  // Thêm hàm để cập nhật thông tin lên Firebase
   const handleSaveChanges = async () => {
     if (user?.uid) {
       try {
@@ -121,8 +122,86 @@ const ProfileEdit = () => {
     }
   };
 
-  // Thêm navigation
   const navigation = useNavigation();
+
+  const translations = {
+    vi: {
+      edit: 'Chỉnh Sửa',
+      generalInfo: 'Thông Tin Chung',
+      firstName: 'Họ',
+      lastName: 'Tên',
+      gender: 'Giới tính',
+      birthDate: 'Ngày Sinh',
+      phoneNumber: 'Số Điện Thoại',
+      email: 'Email',
+      chooseAvatar: 'Chọn ảnh đại diện',
+      fromGallery: 'Thư viện',
+      fromCamera: 'Camera',
+      cancel: 'Hủy',
+      close: 'Đóng',
+      selectGender: 'Chọn Giới Tính',
+      male: 'Nam',
+      female: 'Nữ',
+      other: 'Khác',
+      galleryPermissionDenied: 'Quyền truy cập thư viện ảnh bị từ chối.',
+      cameraPermissionDenied: 'Quyền truy cập camera bị từ chối.',
+      errorUpdatingProfile: 'Lỗi cập nhật thông tin:',
+      searchCountry: 'Tìm kiếm quốc gia...'
+    },
+    en: {
+      edit: 'Edit',
+      generalInfo: 'General Information',
+      firstName: 'First Name',
+      lastName: 'Last Name',
+      gender: 'Gender',
+      birthDate: 'Birth Date',
+      phoneNumber: 'Phone Number',
+      email: 'Email',
+      chooseAvatar: 'Choose Avatar',
+      fromGallery: 'From Gallery',
+      fromCamera: 'From Camera',
+      cancel: 'Cancel',
+      close: 'Close',
+      selectGender: 'Select Gender',
+      male: 'Male',
+      female: 'Female',
+      other: 'Other',
+      galleryPermissionDenied: 'Gallery access permission denied.',
+      cameraPermissionDenied: 'Camera access permission denied.',
+      errorUpdatingProfile: 'Error updating profile:',
+      searchCountry: 'Search country...'
+    }
+  };
+
+  const t = translations[currentLanguage];
+
+  const handleOpenLib = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert(t.galleryPermissionDenied);
+      return;
+    }
+  };
+
+  const handleOpenCamera = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert(t.cameraPermissionDenied);
+      return;
+    }
+  };
+
+  const handleChooseAvatar = () => {
+    Alert.alert(
+      t.chooseAvatar,
+      '',
+      [
+        { text: t.cancel, style: 'cancel' },
+        { text: t.fromGallery, onPress: handleOpenLib },
+        { text: t.fromCamera, onPress: handleOpenCamera },
+      ]
+    );
+  };
 
   if (isLoading) {
     return (
@@ -153,7 +232,7 @@ const ProfileEdit = () => {
             >
               <Feather name="arrow-left" size={24} color="#fff" />
             </TouchableOpacity>
-            <Text style={styles.headerText}>Chỉnh Sửa</Text>
+            <Text style={styles.headerText}>{t.edit}</Text>
           </View>
           <TouchableOpacity
             style={styles.editButton}
@@ -174,10 +253,10 @@ const ProfileEdit = () => {
           <ScrollView contentContainerStyle={styles.content}>
             {/* Thông tin chung */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Thông Tin Chung</Text>
+              <Text style={styles.sectionLabel}>{t.generalInfo}</Text>
               <View style={styles.row}>
                 <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Họ</Text>
+                  <Text style={styles.inputLabel}>{t.firstName}</Text>
                   <TextInput
                     style={[styles.input, isEditable ? styles.editable : null]}
                     value={profile.firstName}
@@ -186,7 +265,7 @@ const ProfileEdit = () => {
                   />
                 </View>
                 <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Tên</Text>
+                  <Text style={styles.inputLabel}>{t.lastName}</Text>
                   <TextInput
                     style={[styles.input, isEditable ? styles.editable : null]}
                     value={profile.lastName}
@@ -198,10 +277,10 @@ const ProfileEdit = () => {
 
               {/* Giới tính */}
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Giới tính</Text>
+                <Text style={styles.inputLabel}>{t.gender}</Text>
                 <TouchableOpacity
                   style={[styles.input, isEditable ? styles.editable : null]}
-                  onPress={() => isEditable && setShowGenderModal(true)} // Show modal if editable
+                  onPress={() => isEditable && setShowGenderModal(true)}
                 >
                   <Text style={styles.inputValue}>{profile.gender}</Text>
                   <Feather name="chevron-down" size={20} color="#666" />
@@ -210,36 +289,14 @@ const ProfileEdit = () => {
 
               {/* Date of Birth */}
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Ngày Sinh</Text>
-                {/* <TouchableOpacity
-                  style={[styles.input, isEditable ? styles.editable : null]}
-                  onPress={() => isEditable && setShowDatePicker(true)}
-                >
-                  <Text style={styles.inputValue}>{profile.birthDate}</Text>
-                </TouchableOpacity> */}
-                
-                {/* {showDatePicker && (
-                  <DateTimePicker
-                    value={new Date(profile.birthDate)}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowDatePicker(false);
-                      if (selectedDate) {
-                        const formattedDate = selectedDate.toISOString().split('T')[0];
-                        handleInputChange('birthDate', formattedDate);
-                      }
-                    }}
-                    is24Hour={true}
-                  />
-                )} */}
+                <Text style={styles.inputLabel}>{t.birthDate}</Text>
                 <DateTimePicker
                   value={new Date(profile.birthDate)}
                   mode="date"
                   display="default"
                   onChange={handleDateChange}
                   is24Hour={true}
-                  disabled={disableDatePicker} // disable DateTimePicker based on disableDatePicker state
+                  disabled={disableDatePicker}
                   style={{marginLeft: '-10'}}
                 />
               </View>
@@ -247,7 +304,7 @@ const ProfileEdit = () => {
 
             {/* Số điện thoại */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Số Điện Thoại</Text>
+              <Text style={styles.sectionLabel}>{t.phoneNumber}</Text>
               <View style={styles.phoneRowWrapper}>
                 <CountryCode 
                   style={styles.countryCodeContainer}
@@ -271,7 +328,7 @@ const ProfileEdit = () => {
 
             {/* Email */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Email</Text>
+              <Text style={styles.sectionLabel}>{t.email}</Text>
               <TextInput
                 style={[styles.input, isEditable ? styles.editable : null]}
                 value={profile.email}
