@@ -246,7 +246,7 @@ const OrderPage = ({ navigation }) => {
             style={styles.dropdownIcon}
           />
         </TouchableOpacity>
-        <Text style={styles.storeText}>CoopXtra Linh Trung HCM</Text>
+        <Text style={styles.storeText}>Phúc Long Tea & Coffee</Text>
         <TouchableOpacity onPress={handleCartPress}>
           <Image
             source={{
