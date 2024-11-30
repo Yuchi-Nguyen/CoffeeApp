@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Swiper from 'react-native-swiper';
@@ -6,6 +6,7 @@ import Header from '../Components/Header';
 import { useNavigation } from '@react-navigation/native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { LanguageContext } from '../context/LanguageContext';
 
 const Home = () => {
   const navigation = useNavigation();
@@ -14,6 +15,7 @@ const Home = () => {
   const [promotions, setPromotions] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { currentLanguage } = useContext(LanguageContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +82,16 @@ const Home = () => {
     return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫";
   };
 
+  const renderCategory = ({ item }) => (
+    <TouchableOpacity
+      style={styles.categoryItem}
+      onPress={() => navigation.navigate('Order', { selectedCategoryId: item.id })}
+    >
+      <Image source={{ uri: item.image }} style={styles.categoryImage} />
+      <Text style={styles.categoryName}>{item.name[currentLanguage]}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
@@ -102,15 +114,7 @@ const Home = () => {
           <FlatList
             data={categories}
             horizontal
-            renderItem={({ item }) => (
-              <TouchableOpacity 
-                style={styles.categoryItem}
-                onPress={() => handleCategoryPress(item.id)}
-              >
-                <Image source={{ uri: item.icon }} style={styles.categoryIcon} />
-                <Text style={styles.categoryText}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
+            renderItem={renderCategory}
             keyExtractor={(item) => item.id.toString()}
           />
         </View>
@@ -182,13 +186,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
-  categoryIcon: {
+  categoryImage: {
     width: 60,
     height: 60,
     borderRadius: 30,
     marginBottom: 8,
   },
-  categoryText: {
+  categoryName: {
     fontSize: 14,
     textAlign: 'center',
   },

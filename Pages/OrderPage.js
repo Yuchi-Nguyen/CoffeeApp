@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { LanguageContext } from '../context/LanguageContext';
 
 const VIEW_MODES = {
   LIST: 'list',
@@ -32,6 +33,8 @@ const OrderPage = ({ navigation }) => {
   // Thêm state mới để lưu trữ dữ liệu từ Firestore
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+
+  const { currentLanguage } = useContext(LanguageContext);
 
   // Fetch categories từ Firestore và sắp xếp theo id
   useEffect(() => {
@@ -154,7 +157,7 @@ const OrderPage = ({ navigation }) => {
               <Text
                 style={[styles.categoryText, item.id === selectedCategory && styles.selectedCategoryText]}
               >
-                {item.name}
+                {item.name[currentLanguage]}
               </Text>
               {item.id === selectedCategory && <View style={styles.selectedUnderline} />}
             </View>
