@@ -170,7 +170,7 @@ const OrderPage = ({ navigation }) => {
         {/* Bộ lọc hiển thị */}
         <View style={styles.filterContainer}>
           <Text style={styles.categoryTitle}>
-            {categories.find((cat) => cat.id === selectedCategory)?.name}
+            {categories.find((cat) => cat.id === selectedCategory)?.name[currentLanguage]}
           </Text>
           <View style={styles.viewModeButtons}>
             <TouchableOpacity onPress={() => setViewMode(VIEW_MODES.LIST)}>
