@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -16,23 +16,48 @@ import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebase';  // Đảm bảo đường dẫn đúng
+import { db } from '../config/firebase'; 
+import { LanguageContext } from '../context/LanguageContext';
+
+const translations = {
+  vi: {
+    loading: 'Đang tải dữ liệu...',
+    searchPlaceholder: 'Tìm kiếm cửa hàng...',
+    listView: 'Danh sách',
+    mapView: 'Bản đồ',
+    open: 'Mở cửa',
+    closed: 'Đóng cửa',
+    currentlySelected: 'Đang lựa chọn',
+    phone: 'Điện thoại:'
+  },
+  en: {
+    loading: 'Loading...',
+    searchPlaceholder: 'Search stores...',
+    listView: 'List',
+    mapView: 'Map',
+    open: 'Open',
+    closed: 'Closed',
+    currentlySelected: 'Currently Selected',
+    phone: 'Phone:'
+  }
+};
 
 const StoresPage = () => {
+  const { currentLanguage } = useContext(LanguageContext);
   const [searchText, setSearchText] = useState('');
   const [currentView, setCurrentView] = useState('list');
   const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch stores từ Firebase khi component mount
+  const t = translations[currentLanguage];
+
   useEffect(() => {
     const fetchStores = async () => {
       try {
         const storesSnapshot = await getDocs(collection(db, 'stores'));
         const storesData = storesSnapshot.docs.map(doc => ({
           ...doc.data(),
-          // Đảm bảo location là object với latitude và longitude
           location: {
             latitude: doc.data().location.latitude,
             longitude: doc.data().location.longitude
@@ -40,17 +65,16 @@ const StoresPage = () => {
         }));
         setStores(storesData);
         
-        // Kiểm tra selectedStore từ AsyncStorage
         const savedStoreId = await AsyncStorage.getItem('selectedStoreId');
         if (savedStoreId) {
           const store = storesData.find(s => s.id === savedStoreId);
           if (store) {
             setSelectedStore(store);
           } else {
-            setSelectedStore(storesData[0]); // Mặc định store đầu tiên
+            setSelectedStore(storesData[0]); 
           }
         } else {
-          setSelectedStore(storesData[0]); // Mặc định store đầu tiên
+          setSelectedStore(storesData[0]);
         }
         
         setLoading(false);
@@ -63,7 +87,6 @@ const StoresPage = () => {
     fetchStores();
   }, []);
 
-  // Hàm xử lý khi chọn cửa hàng
   const handleStoreSelect = async (store) => {
     setSelectedStore(store);
     try {
@@ -95,7 +118,7 @@ const StoresPage = () => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Đang tải dữ liệu...</Text>
+        <Text>{t.loading}</Text>
       </View>
     );
   }
@@ -110,7 +133,7 @@ const StoresPage = () => {
         <Feather name="search" size={20} color="#6a6a6a" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Tìm kiếm cửa hàng..."
+          placeholder={t.searchPlaceholder}
           value={searchText}
           onChangeText={setSearchText}
         />
@@ -120,11 +143,11 @@ const StoresPage = () => {
       <View style={styles.toggleContainer}>
         <TouchableOpacity onPress={() => setCurrentView('list')} style={styles.toggleButton}>
           <Ionicons name="list" size={24} color={currentView === 'list' ? '#e91e63' : '#000'} />
-          <Text style={[styles.toggleText, currentView === 'list' && styles.activeText]}>Danh sách</Text>
+          <Text style={[styles.toggleText, currentView === 'list' && styles.activeText]}>{t.listView}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setCurrentView('map')} style={styles.toggleButton}>
           <Ionicons name="map" size={24} color={currentView === 'map' ? '#e91e63' : '#000'} />
-          <Text style={[styles.toggleText, currentView === 'map' && styles.activeText]}>Bản đồ</Text>
+          <Text style={[styles.toggleText, currentView === 'map' && styles.activeText]}>{t.mapView}</Text>
         </TouchableOpacity>
       </View>
 
@@ -150,12 +173,12 @@ const StoresPage = () => {
                   {/* Trạng thái mở cửa và tag "Đang lựa chọn" */}
                   <View style={styles.statusContainer}>
                     <Text style={styles.storeStatus}>
-                      {isOpen(item.openHours) ? 'Open' : 'Closed'}
+                      {isOpen(item.openHours) ? t.open : t.closed}
                     </Text>
 
                     {/* Tag "Đang lựa chọn" nếu cửa hàng đang được chọn */}
                     {selectedStore && selectedStore.id === item.id && (
-                      <Text style={styles.selectedTag}>Đang lựa chọn</Text>
+                      <Text style={styles.selectedTag}>{t.currentlySelected}</Text>
                     )}
                   </View>
                 </View>

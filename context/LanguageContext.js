@@ -13,6 +13,8 @@ export const LanguageProvider = ({ children }) => {
         const savedLanguage = await AsyncStorage.getItem('language');
         if (savedLanguage) {
           setCurrentLanguage(savedLanguage);
+        } else {
+          await AsyncStorage.setItem('language', 'vi');
         }
       } catch (error) {
         console.error('Error loading language:', error);

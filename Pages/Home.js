@@ -17,6 +17,25 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const { currentLanguage } = useContext(LanguageContext);
 
+  const translations = {
+    vi: {
+      categories: 'Danh mục sản phẩm',
+      currentPromotions: 'Ưu đãi hiện tại',
+      bestSellers: 'Sản phẩm bán chạy',
+      searchPlaceholder: 'Tìm kiếm sản phẩm...',
+      currency: 'đ'
+    },
+    en: {
+      categories: 'Categories',
+      currentPromotions: 'Current Promotions',
+      bestSellers: 'Best Sellers',
+      searchPlaceholder: 'Search products...',
+      currency: 'VND'
+    }
+  };
+
+  const t = translations[currentLanguage];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -73,7 +92,10 @@ const Home = () => {
   const handleCategoryPress = (categoryId) => {
     navigation.navigate('Order', {
       screen: 'OrderScreen',
-      params: { selectedCategoryId: categoryId }
+      params: { 
+        selectedCategoryId: categoryId,
+        language: currentLanguage
+      }
     });
   };
 
@@ -82,13 +104,13 @@ const Home = () => {
   };
 
   const formatCurrency = (amount) => {
-    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫";
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " " + t.currency;
   };
 
   const renderCategory = ({ item }) => (
     <TouchableOpacity
       style={styles.categoryItem}
-      onPress={() => navigation.navigate('Order', { selectedCategoryId: item.id })}
+      onPress={() => handleCategoryPress(item.id)}
     >
       <Image source={{ uri: item.icon }} style={styles.categoryImage} />
       <Text style={styles.categoryName}>{item.name[currentLanguage]}</Text>
@@ -113,7 +135,7 @@ const Home = () => {
 
         {/* Danh mục sản phẩm */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Danh mục sản phẩm</Text>
+          <Text style={styles.sectionTitle}>{t.categories}</Text>
           <FlatList
             data={categories}
             horizontal
@@ -124,7 +146,7 @@ const Home = () => {
 
         {/* Ưu đãi hiện tại */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ưu đãi hiện tại</Text>
+          <Text style={styles.sectionTitle}>{t.currentPromotions}</Text>
           <FlatList
             data={promotions}
             horizontal
@@ -142,7 +164,7 @@ const Home = () => {
 
         {/* Sản phẩm bán chạy */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sản phẩm bán chạy</Text>
+          <Text style={styles.sectionTitle}>{t.bestSellers}</Text>
           <FlatList
             data={bestSellers}
             horizontal
