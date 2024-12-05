@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+//Tạo context để quản lý trạng thái ngôn ngữ
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
