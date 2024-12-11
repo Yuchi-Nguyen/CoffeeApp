@@ -47,11 +47,5 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.19.13"
   },
-  "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/preset-react": "^7.25.9",
-    "metro-react-native-babel-preset": "^0.77.0",
-    "react-native-dotenv": "^3.4.11"
-  },
   "private": true
 }
